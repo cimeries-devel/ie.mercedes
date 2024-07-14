@@ -1,0 +1,91 @@
+plugins {
+    id 'application'
+    id 'org.beryx.runtime' version '1.12.7'
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'mercedes',
+                'Main-Class': 'com.babasdevel.mercedes.Application'
+    }
+}
+
+group = 'com.babasdevel'
+version = '2023.06'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.intellij:forms_rt:7.0.3'
+    implementation 'com.formdev:flatlaf:3.4.1'
+    implementation 'com.formdev:flatlaf-extras:3.4.1'
+    implementation 'org.swinglabs.swingx:swingx-all:1.6.5-1'
+    implementation 'com.google.code.gson:gson:2.11.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'org.hibernate:hibernate-core:6.5.2.Final'
+    implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
+    implementation 'javax.validation:validation-api:2.0.1.Final'
+    implementation 'org.glassfish:jakarta.el:4.0.2'
+    implementation 'org.apache.commons:commons-text:1.12.0'
+    implementation 'org.apache.poi:poi:5.2.5'
+    implementation 'org.apache.poi:poi-ooxml:5.2.5'
+    implementation 'org.apache.logging.log4j:log4j-core:2.23.1'
+    implementation 'com.h2database:h2:2.2.224'
+    implementation 'org.hibernate.validator:hibernate-validator-cdi:8.0.1.Final'
+    implementation 'net.sf.jasperreports:jasperreports:6.21.3'
+    implementation 'net.sf.jasperreports:jasperreports-fonts:6.21.3'
+//    implementation 'com.lowagie:itext:2.1.7'
+    testImplementation platform('org.junit:junit-bom:5.10.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+}
+
+application {
+    mainClass = 'com.babasdevel.mercedes.Application'
+    applicationName = 'mercedes'
+}
+
+runtime {
+    modules = []
+    jpackage {
+        jpackageHome = '/home/cimeries/.opt/jdk-17.0.7'
+        def currentOS = org.gradle.internal.os.OperatingSystem.current()
+        installerOptions += ['--vendor', 'Babas.devel']
+        if (currentOS.windows){
+            imageOptions += ['--icon', 'src/main/resources/com/babasdevel/views/favicon.ico']
+            installerOptions += ['--icon', 'src/main/resources/com/babasdevel/views/favicon.ico',
+                                 '--win-dir-chooser',
+                                 '--win-menu',
+                                 '--win-menu-group', 'Mercedes',
+                                 '--win-shortcut',
+                                 '--app-version', '0.0.1']
+            installerName = application.getApplicationName()
+            installerType = 'exe'
+        } else if (currentOS.linux){
+            installerOptions += ['--icon', 'src/main/resources/com/babasdevel/views/favicon.png',
+                                 '--linux-package-name', 'mercedes',
+                                 '--linux-shortcut',
+                                 '--about-url', 'www.babasdevel.com/software/mercedes',
+                                 '--linux-menu-group', 'Education']
+            installerType = 'rpm'
+        } else if (currentOS.macOsX){
+            installerOptions += ['--icon', 'src/main/resources/com/babasdevel/views/favicon.icns']
+            installerOptions += ['--mac-package-name', 'mercedes']
+            installerOptions += ['--about-url', 'www.babasdevel.com/software/mercedes']
+            installerType = 'dmg'
+        }
+    }
+}
+
+tasks.jpackage.doFirst{
+    def currentOs = org.gradle.internal.os.OperatingSystem.current()
+    def basePath = currentOs.windows?project.name:currentOs.linux?"$project.name/lib":"${project.name}.app/Contents"
+    copy {
+        from('src/main/resources')
+        into("$buildDir/jpackage/$basePath/app")
+    }
+}
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
