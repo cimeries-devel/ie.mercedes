@@ -112,7 +112,7 @@ public class TableModel {
                     student.cd_1 = WordUtils.capitalizeFully(value.toString());
                     int len = student.cd_1.trim().length();
                     if (len != 0)
-                        if (len <= 11 || len > 64) {
+                        if (len < 11 || len > 64) {
                             JOptionPane.showMessageDialog(
                                     null,
                                     "La conclusión ingresa excede la longitud permitida.\nMínimo 11 y máximo 64 carácteres",

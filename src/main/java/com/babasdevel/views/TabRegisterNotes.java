@@ -18,6 +18,8 @@ import org.jdesktop.swingx.prompt.PromptSupport;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.plaf.basic.BasicComboBoxUI;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
@@ -294,80 +296,30 @@ public class TabRegisterNotes extends Tab {
                         switch (index) {
                             case 0:
                                 if (student.nl_1.isEmpty()) continue;
-                                if (!student.nl_1.contains("A")){
-                                    if (!(student.cd_1.trim().length() > 11 && student.cd_1.trim().length()<=64)) {
-                                        JOptionPane.showMessageDialog(
-                                                dashboard,
-                                                "Las notas B o C requieren conclusión descriptiva",
-                                                "Conclusiones descriptivas",
-                                                JOptionPane.ERROR_MESSAGE);
-                                        continue;
-                                    }
-                                }
                                 note.observation = student.cd_1;
                                 note.note = student.nl_1;
                                 note.skill = s.getFirst().getId();
                                 break;
                             case 1:
                                 if (student.nl_2.isEmpty()) continue;
-                                if (!student.nl_2.contains("A")){
-                                    if (!(student.cd_2.trim().length() > 11 && student.cd_2.trim().length()<=64)) {
-                                        JOptionPane.showMessageDialog(
-                                                dashboard,
-                                                "Las notas B o C requieren conclusión descriptiva",
-                                                "Conclusiones descriptivas",
-                                                JOptionPane.ERROR_MESSAGE);
-                                        continue;
-                                    }
-                                }
                                 note.observation = student.cd_2;
                                 note.note = student.nl_2;
                                 note.skill = s.get(1).getId();
                                 break;
                             case 2:
                                 if (student.nl_3.isEmpty()) continue;
-                                if (!student.nl_3.contains("A")){
-                                    if (!(student.cd_3.trim().length() > 11 && student.cd_3.trim().length()<=64)) {
-                                        JOptionPane.showMessageDialog(
-                                                dashboard,
-                                                "Las notas B o C requieren conclusión descriptiva",
-                                                "Conclusiones descriptivas",
-                                                JOptionPane.ERROR_MESSAGE);
-                                        continue;
-                                    }
-                                }
                                 note.observation = student.cd_3;
                                 note.note = student.nl_3;
                                 note.skill = s.get(2).getId();
                                 break;
                             case 3:
                                 if (student.nl_4.isEmpty()) continue;
-                                if (!student.nl_4.contains("A")){
-                                    if (!(student.cd_4.trim().length() > 11 && student.cd_4.trim().length()<=64)) {
-                                        JOptionPane.showMessageDialog(
-                                                dashboard,
-                                                "Las notas B o C requieren conclusión descriptiva",
-                                                "Conclusiones descriptivas",
-                                                JOptionPane.ERROR_MESSAGE);
-                                        continue;
-                                    }
-                                }
                                 note.observation = student.cd_4;
                                 note.note = student.nl_4;
                                 note.skill = s.get(3).getId();
                                 break;
                             default:
                                 if (student.nl_5.isEmpty()) continue;
-                                if (!student.nl_5.contains("A")){
-                                    if (!(student.cd_5.trim().length() > 11 && student.cd_5.trim().length()<=64)) {
-                                        JOptionPane.showMessageDialog(
-                                                dashboard,
-                                                "Las notas B o C requieren conclusión descriptiva",
-                                                "Conclusiones descriptivas",
-                                                JOptionPane.ERROR_MESSAGE);
-                                        continue;
-                                    }
-                                }
                                 note.observation = student.cd_5;
                                 note.note = student.nl_5;
                                 note.skill = s.get(4).getId();
@@ -376,6 +328,29 @@ public class TabRegisterNotes extends Tab {
                     }
                 }
                 if (data.isEmpty()) return;
+                for (NoteModel nm : data){
+                    if (!nm.observation.isEmpty() && (nm.observation.length() > 64 || nm.observation.length() < 11)){
+                        JOptionPane.showMessageDialog(dashboard,
+                                "Las conclusiones descriptivas, mínimo debe contener 11 y máximo 64 carateres",
+                                "Cambios no guardados",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    if (nm.note.equals("C")){
+                        JOptionPane.showMessageDialog(dashboard,
+                                "Una o más notas requieren conclusión descriptiva",
+                                "Cambios no guardados",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    if (dashboard.teacherAuth.level.getLevel().equalsIgnoreCase("Primaria") && nm.note.equals("B")){
+                        JOptionPane.showMessageDialog(dashboard,
+                                "Una o más notas requieren conclusión descriptiva",
+                                "Cambios no guardados",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                }
                 int code = controllerNote.post(dashboard.teacherAuth, data);
                 if (code == Codes.CODE_CREATED) {
                     JOptionPane.showMessageDialog(dashboard,
@@ -406,6 +381,7 @@ public class TabRegisterNotes extends Tab {
                 }
                 break;
             case "send_template":
+
                 break;
             case "generate_consolidate":
                 break;
@@ -590,8 +566,8 @@ public class TabRegisterNotes extends Tab {
                 }
                 return hyper;
             });
-            columnNl.setPreferredWidth(60);
-            columnNl.setMaxWidth(60);
+            columnNl.setPreferredWidth(65);
+            columnNl.setMaxWidth(65);
             group.add(columnNl);
             TableColumn columnC = table.getColumn("Conclusión " + col);
             columnC.setCellRenderer((table, value, isSelected, hasFocus, row, column) -> {

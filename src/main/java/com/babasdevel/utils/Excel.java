@@ -16,8 +16,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class Excel {
@@ -108,15 +106,16 @@ public class Excel {
         styleRotate.setWrapText(true);
         styleRotate.setAlignment(HorizontalAlignment.CENTER);
         styleRotate.setVerticalAlignment(VerticalAlignment.CENTER);
-        styleRotate.setFont(font);
+        styleRotate.setFont(fontBold);
         styleRotate.setBorderBottom(BorderStyle.THIN);
         styleRotate.setBorderTop(BorderStyle.THIN);
         styleRotate.setBorderLeft(BorderStyle.THIN);
         styleRotate.setBorderRight(BorderStyle.THIN);
-        styleRotate.setRotation((short) 90);
+//        styleRotate.setRotation((short) 90);
 
         CellStyle styleRotateBold = book.createCellStyle();
         styleRotateBold.setLocked(true);
+        styleRotateBold.setWrapText(true);
         styleRotateBold.setAlignment(HorizontalAlignment.CENTER);
         styleRotateBold.setVerticalAlignment(VerticalAlignment.CENTER);
         styleRotateBold.setFont(fontBold);
@@ -124,13 +123,13 @@ public class Excel {
         styleRotateBold.setBorderTop(BorderStyle.THIN);
         styleRotateBold.setBorderLeft(BorderStyle.THIN);
         styleRotateBold.setBorderRight(BorderStyle.THIN);
-        styleRotateBold.setRotation((short) 90);
+//        styleRotateBold.setRotation((short) 90);
 
         for (Grade grade : controllerCargo.allGrades(dashboard.teacherAuth, true)) {
             int n = 4;
             int colEnd = 0;
             if (book.getSheetIndex(grade.getName()) != -1) continue;
-            XSSFSheet sheet = book.createSheet(grade.getName());
+            XSSFSheet sheet = book.createSheet(String.format("%d - %s", grade.getId(), grade.getName()));
             sheet.protectSheet("aip");
             sheet.createFreezePane(4, 0);
             Row row = sheet.createRow(0);
@@ -183,14 +182,14 @@ public class Excel {
                 cell = rowCourse.createCell(nn);
                 cell.setCellStyle(style);
                 cell.setCellValue(String.format("%s - %s", course.getName(), course.getAbbreviation()));
-                sheet.addMergedRegion(new CellRangeAddress(1, 1, nn, nn+course.getSkills().size()*4+3));
-                nn += course.getSkills().size()*4+4;
-                colEnd += course.getSkills().size()*4+4;
+                sheet.addMergedRegion(new CellRangeAddress(1, 1, nn, nn+course.getSkills().size()*2-1));
+                nn += course.getSkills().size()*2;
+                colEnd += course.getSkills().size()*2;
             }
             colEnd += 3;
 
             row = sheet.createRow(4);
-            row.setHeight((short) 3000);
+//            row.setHeight((short) 3000);
             cell = row.createCell(0);
             cell.setCellStyle(style);
             cell.setCellValue("Código");
@@ -199,18 +198,25 @@ public class Excel {
             cell.setCellValue("Apellidos y Nombres");
             sheet.addMergedRegion(new CellRangeAddress(4, 4, 1,3));
 
+//            Row rowNlC = sheet.createRow(3);
             for (Course course : controllerCargo.all(grade, dashboard.teacherAuth, true)) {
-                for(int p = 1; p<=4; p++){
-                    for (Skill skill : course.getSkills()) {
-                        cell = rowGrade.createCell(n++);
-                        cell.setCellStyle(styleRotate);
-                        cell.setCellValue(String.format("%d. %s", skill.getIndex(), skill.getName()));
-                        sheet.addMergedRegion(new CellRangeAddress(2, 4, n-1, n-1));
-                    }
-                    cell = rowGrade.createCell(n++);
+                for (Skill skill : course.getSkills()) {
+                    cell = rowGrade.createCell(n);
+                    cell.setCellStyle(styleRotate);
+                    cell.setCellValue(skill.getName());
+                    sheet.addMergedRegion(new CellRangeAddress(2, 3, n, n+1));
+
+                    Row rowNlC = sheet.getRow(4);
+                    cell = rowNlC.createCell(n);
+                    cell.setCellStyle(styleRotate);
+                    cell.setCellValue("NL");
+//                    sheet.addMergedRegion(new CellRangeAddress(4, 4, n, n));
+
+                    cell = rowNlC.createCell(++n);
                     cell.setCellStyle(styleRotateBold);
-                    cell.setCellValue("Calificativo "+p);
-                    sheet.addMergedRegion(new CellRangeAddress(2, 4, n-1, n-1));
+                    cell.setCellValue("Conclusión descriptiva");
+//                    sheet.addMergedRegion(new CellRangeAddress(4, 4, n, n));
+                    sheet.setColumnWidth(n++, 9000);
                 }
             }
 
@@ -235,20 +241,17 @@ public class Excel {
             n = 4;
             int numRowNote = controllerRegistration.all(grade, true).size();
             for (Course course : controllerCargo.all(grade, dashboard.teacherAuth, true)) {
-                for(int p = 1; p<=4; p++){
+                for (Skill ignored : course.getSkills()){
                     DataValidationHelper validationHelper = new XSSFDataValidationHelper(sheet);
-                    CellRangeAddressList addressList = new CellRangeAddressList(4, numRowNote+4, n, course.getSkills().size()+n-1);
+                    CellRangeAddressList addressList = new CellRangeAddressList(5, numRowNote+4, n, n);
                     DataValidationConstraint constraint = validationHelper.createExplicitListConstraint(new String[]{"AD", "A", "B", "C"});
                     DataValidation dataValidation = validationHelper.createValidation(constraint, addressList);
                     dataValidation.setSuppressDropDownArrow(true);
                     dataValidation.setShowErrorBox(true);
                     sheet.addValidationData(dataValidation);
-                    n = course.getSkills().size()+n;
-                    cell = row.createCell(++n);
-                    cell.setCellStyle(styleNoteLocked);
+                    n += 2;
                 }
             }
-
             sheet.addMergedRegion(new CellRangeAddress(0, 0, 4, colEnd));
             sheet.setColumnWidth(0, 4500);
             sheet.setColumnWidth(1, 3500);
