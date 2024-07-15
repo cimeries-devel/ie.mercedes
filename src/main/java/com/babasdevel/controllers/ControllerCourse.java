@@ -45,6 +45,15 @@ public class ControllerCourse extends Hibernate {
         course = session.find(Course.class, id, LockModeType.NONE);
         return course;
     }
+    public Course get(String abbreviation){
+        criteria = builder.createQuery(Course.class);
+        attributes = criteria.from(Course.class);
+        criteria.select(attributes).where(
+                builder.equal(attributes.get("abbreviation"), abbreviation)
+        );
+        course = session.createQuery(criteria).getSingleResult();
+        return course;
+    }
     public List<Course> all(Level level){
         criteria = builder.createQuery(Course.class);
         attributes = criteria.from(Course.class);

@@ -10,6 +10,8 @@ public class Icons {
     public static final Icon ICON_PDF = new ImageIcon(Objects.requireNonNull(
             Icons.class.getResource("/com/babasdevel/views/pdf.png")));
     public static final Icon ICON_PDF_VIEW = new ImageIcon(Objects.requireNonNull(
+            Icons.class.getResource("/com/babasdevel/views/siagie.png")));
+    public static final Icon ICON_SIAGIE = new ImageIcon(Objects.requireNonNull(
             Icons.class.getResource("/com/babasdevel/views/view.png")));
     public static final Icon ICON_PDF_SAVE = new ImageIcon(Objects.requireNonNull(
             Icons.class.getResource("/com/babasdevel/views/save.png")));

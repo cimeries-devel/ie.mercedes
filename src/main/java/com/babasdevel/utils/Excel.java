@@ -4,6 +4,7 @@ import com.babasdevel.controllers.*;
 import com.babasdevel.models.*;
 import com.babasdevel.views.Dashboard;
 import org.apache.commons.compress.utils.FileNameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellRangeAddressList;
@@ -419,111 +420,124 @@ public class Excel {
             sheet.autoSizeColumn(1);
         }
     }
-    public void insertNotes(File file, Grade grade){
+    public void insertNotes(File[] files, Grade grade){
         try {
-            Workbook book = new XSSFWorkbook(new FileInputStream(file));
-            controllerCourse.downloadData(dashboard.teacherAuth);
-            controllerCargo.downloadData(dashboard.teacherAuth);
-            controllerTeacher.downloadData(dashboard.teacherAuth);
-            grade.cleanOfCache();
-            grade = controllerGrade.get(grade.getId());
-            for (Cargo cargo : grade.getCargos()) {
-                controllerNote.downloadData(dashboard.teacherAuth, grade, cargo.getCourse());
-                Sheet sheet = book.getSheet(cargo.getCourse().getAbbreviation());
-                if (sheet.getSheetName().equals("0006-DESEN TIC")){
-                    twoSheets(book, grade, cargo.getTeacher());
-                    continue;
-                }
-                DataFormatter formatter = new DataFormatter();
-                for (Row row : sheet){
-                    String code = formatter.formatCellValue(row.getCell(1));
-                    if (code.trim().length()<8) continue;
-                    Student student = controllerStudent.get(code);
-                    if (student == null) continue;
-                    for (Skill skill : cargo.getCourse().getSkills()) {
-                        Partial partial = controllerPartial.get(1L, cargo.getCourse());
-                        Note note = controllerNote.get(
-                                grade,
-                                cargo.getCourse(),
-                                skill,
-                                partial,
-                                cargo.getTeacher(),
-                                student,
-                                dashboard.teacherAuth.level);
-                        String logro = "No logró alcanzar el nivel de competencia esperado";
-                        switch (skill.getIndex()){
-                            case 1:
-                                row.getCell(3).setCellValue(note==null?"C":note.getNote());
-                                row.getCell(4).setCellValue(note==null?logro:note.getObservation());
-                                break;
-                            case 2:
-                                row.getCell(5).setCellValue(note==null?"C":note.getNote());
-                                row.getCell(6).setCellValue(note==null?logro:note.getObservation());
-                                break;
-                            case 3:
-                                row.getCell(7).setCellValue(note==null?"C":note.getNote());
-                                row.getCell(8).setCellValue(note==null?logro:note.getObservation());
-                                break;
-                            case 4:
-                                row.getCell(9).setCellValue(note==null?"C":note.getNote());
-                                row.getCell(10).setCellValue(note==null?logro:note.getObservation());
-                                break;
-                            default:
-                                row.getCell(11).setCellValue(note==null?"C":note.getNote());
-                                row.getCell(12).setCellValue(note==null?logro:note.getObservation());
+            for (File file : files){
+                Workbook book = new XSSFWorkbook(new FileInputStream(file));
+                Sheet sheet = book.getSheet("Generalidades");
+                Row rowData = sheet.getRow(9);
+                String nameClassroom = rowData.getCell(7).getStringCellValue();
+                String nameSection = rowData.getCell(9).getStringCellValue();
+                ControllerSection controllerSection = new ControllerSection();
+                ControllerClassroom controllerClassroom = new ControllerClassroom();
+                Section section = controllerSection.get(nameSection);
+                Classroom classroom = controllerClassroom.get(nameClassroom);
+                grade = controllerGrade.get(section, classroom);
+
+                controllerCourse.downloadData(dashboard.teacherAuth);
+                controllerCargo.downloadData(dashboard.teacherAuth);
+                controllerTeacher.downloadData(dashboard.teacherAuth);
+                grade.cleanOfCache();
+                grade = controllerGrade.get(grade.getId());
+                for (Cargo cargo : grade.getCargos()) {
+                    sheet = book.getSheet(cargo.getCourse().getAbbreviation());
+                    if (sheet == null){
+                        twoSheets(book, grade, cargo.getTeacher(), dashboard.permission.getPartial());
+                        continue;
+                    }
+                    DataFormatter formatter = new DataFormatter();
+                    for (Row row : sheet){
+                        String code = formatter.formatCellValue(row.getCell(1));
+                        if (!StringUtils.isNumeric(code)) continue;
+                        Student student = controllerStudent.get(String.valueOf(Long.parseLong(code)));
+                        if (student == null) continue;
+                        for (Skill skill : cargo.getCourse().getSkills()) {
+                            Partial partial = controllerPartial.get(dashboard.permission.getPartial(), cargo.getCourse());
+                            Note note = controllerNote.get(
+                                    grade,
+                                    cargo.getCourse(),
+                                    skill,
+                                    partial,
+                                    cargo.getTeacher(),
+                                    student,
+                                    dashboard.teacherAuth.level);
+                            if (note == null) continue;
+                            switch (skill.getIndex()){
+                                case 1:
+                                    row.getCell(3).setCellValue(note.getNote());
+                                    row.getCell(4).setCellValue(note.getObservation());
+                                    break;
+                                case 2:
+                                    row.getCell(5).setCellValue(note.getNote());
+                                    row.getCell(6).setCellValue(note.getObservation());
+                                    break;
+                                case 3:
+                                    row.getCell(7).setCellValue(note.getNote());
+                                    row.getCell(8).setCellValue(note.getObservation());
+                                    break;
+                                case 4:
+                                    row.getCell(9).setCellValue(note.getNote());
+                                    row.getCell(10).setCellValue(note.getObservation());
+                                    break;
+                                default:
+                                    row.getCell(11).setCellValue(note.getNote());
+                                    row.getCell(12).setCellValue(note.getObservation());
+                            }
                         }
                     }
                 }
+                FileOutputStream outputStream = new FileOutputStream(file);
+                book.write(outputStream);
+                book.close();
             }
-            FileOutputStream outputStream = new FileOutputStream(file);
-            book.write(outputStream);
-            book.close();
             JOptionPane.showMessageDialog(dashboard, "Se ha registrado correctamente las notas");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-    public void twoSheets(Workbook book, Grade grade, Teacher teacher){
+    public void twoSheets(Workbook book, Grade grade, Teacher teacher, Long numberPartial){
         Sheet sheet_tic = book.getSheet("0006-DESEN TIC");
         Sheet sheet_auto = book.getSheet("0007-GEST AUTO");
         DataFormatter formatter = new DataFormatter();
 
-        Course course = controllerCourse.get(11L);
+        Course course = controllerCourse.get("TUTORIA");
         for (Row row : sheet_tic){
             String code = formatter.formatCellValue(row.getCell(1));
-            if (code.trim().length()<8) continue;
-            Student student = controllerStudent.get(code);
+            if (!StringUtils.isNumeric(code)) continue;
+            Student student = controllerStudent.get(String.valueOf(Long.parseLong(code)));
             if (student == null) continue;
-            Skill skill = course.getSkills().get(0);
-            Partial partial = controllerPartial.get(1L, course);
+
+            Partial partial = controllerPartial.get(numberPartial, course);
             Note note = controllerNote.get(
                     grade,
                     course,
-                    skill,
+                    course.getSkills().getFirst(),
                     partial,
                     teacher,
                     student,
                     dashboard.teacherAuth.level);
-            row.getCell(3).setCellValue(note==null?"A":note.getNote());
-            row.getCell(4).setCellValue(note==null?"Se desenvuelve en entornos virtuales generados por las TIC":note.getObservation());
+            if (note == null) continue;
+            row.getCell(3).setCellValue(note.getNote());
+            row.getCell(4).setCellValue(note.getObservation());
         }
         for (Row row : sheet_auto){
             String code = formatter.formatCellValue(row.getCell(1));
-            if (code.trim().length()<8) continue;
-            Student student = controllerStudent.get(code);
+            if (!StringUtils.isNumeric(code)) continue;
+            Student student = controllerStudent.get(String.valueOf(Long.parseLong(code)));
             if (student == null) continue;
-            Skill skill = course.getSkills().get(1);
-            Partial partial = controllerPartial.get(1L, course);
+
+            Partial partial = controllerPartial.get(2L, course);
             Note note = controllerNote.get(
                     grade,
                     course,
-                    skill,
+                    course.getSkills().getLast(),
                     partial,
                     teacher,
                     student,
                     dashboard.teacherAuth.level);
-            row.getCell(3).setCellValue(note==null?"A":note.getNote());
-            row.getCell(4).setCellValue(note==null?"Gestiona su Aprendizaje de manera autónoma":note.getObservation());
+            if (note == null) continue;
+            row.getCell(3).setCellValue(note.getNote());
+            row.getCell(4).setCellValue(note.getObservation());
         }
     }
     public boolean saveBook(String nameExcel){
@@ -562,8 +576,9 @@ public class Excel {
         }
         return status;
     }
-    public File loadBook(){
+    public File[] loadBook(){
         final JFileChooser fc = new JFileChooser();
+        fc.setMultiSelectionEnabled(true);
 
         FileNameExtensionFilter filterExcel = new FileNameExtensionFilter("Microsoft Excel (.xlsx)", "xlsx");
         fc.addChoosableFileFilter(filterExcel);
@@ -571,7 +586,7 @@ public class Excel {
 
         int value = fc.showOpenDialog(dashboard);
         if (value == JFileChooser.APPROVE_OPTION){
-            return fc.getSelectedFile();
+            return fc.getSelectedFiles();
         }
         return null;
     }

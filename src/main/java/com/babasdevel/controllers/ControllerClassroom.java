@@ -26,6 +26,15 @@ public class ControllerClassroom extends Hibernate{
         classroom = session.find(Classroom.class, id, LockModeType.NONE);
         return classroom;
     }
+    public Classroom get(String name){
+        criteria = builder.createQuery(Classroom.class);
+        attributes = criteria.from(Classroom.class);
+        criteria.select(attributes).where(
+                builder.equal(builder.upper(attributes.get("classroom")), name.toUpperCase())
+        );
+        classroom = session.createQuery(criteria).getSingleResult();
+        return classroom;
+    }
     public List<Classroom> all(){
         criteria = builder.createQuery(Classroom.class);
         attributes = criteria.from(Classroom.class);

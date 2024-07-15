@@ -149,7 +149,11 @@ public class TabRegisterNotes extends Tab {
         if (controllerCargo.allGrades(dashboard.teacherAuth, true).isEmpty()) {
             downloadData();
         } else {
-            comboModelGrade.addAll(controllerCargo.allGrades(dashboard.teacherAuth, true));
+            if (dashboard.teacherAuth.getSuperuser()) {
+                comboModelGrade.addAll(controllerGrade.all(dashboard.teacherAuth.level));
+            } else {
+                comboModelGrade.addAll(controllerCargo.allGrades(dashboard.teacherAuth, true));
+            }
             comboGrade.setSelectedIndex(0);
         }
 

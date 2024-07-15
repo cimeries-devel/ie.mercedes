@@ -83,7 +83,7 @@ public class TableModel {
                 case 5:
                     return student.getFirstName();
                 case 6:
-                    return student.getGender()?"Hombre":"Mujer";
+                    return student.getGender()?"Masculino":"Femenino";
                 case 7:
                     return student.getBirthDate();
                 default:
@@ -256,24 +256,16 @@ public class TableModel {
         @Override
         public Object getValueAt(int row, int col){
             Student student = students.get(row);
-            switch (col){
-                case 0:
-                    return row+1;
-                case 1:
-                    return student.getTypeDocument().equals("1")?"DNI":"-";
-                case 2:
-                    return student.getNumberDocument();
-                case 3:
-                    return student.getCodeStudent();
-                case 4:
-                    return String.format("%s %s", student.getLastNameFather(), student.getLastNameMother());
-                case 5:
-                    return student.getFirstName();
-                case 6:
-                    return student.getGender()?"Hombre":"Mujer";
-                default:
-                    return student.getBirthDate();
-            }
+            return switch (col) {
+                case 0 -> row + 1;
+                case 1 -> student.getTypeDocument().equals("1") ? "DNI" : "-";
+                case 2 -> student.getNumberDocument();
+                case 3 -> student.getCodeStudent();
+                case 4 -> String.format("%s %s", student.getLastNameFather(), student.getLastNameMother());
+                case 5 -> student.getFirstName();
+                case 6 -> student.getGender() ? "Masculino" : "Femenino";
+                default -> student.getBirthDate();
+            };
         }
     }
 }

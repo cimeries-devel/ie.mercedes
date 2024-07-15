@@ -6,6 +6,7 @@ import com.babasdevel.common.Hibernate;
 import com.babasdevel.components.Tab;
 import com.babasdevel.controllers.*;
 import com.babasdevel.gallery.Icons;
+import com.babasdevel.mercedes.Application;
 import com.babasdevel.models.*;
 import com.babasdevel.utils.Excel;
 import com.formdev.flatlaf.extras.components.*;
@@ -223,6 +224,8 @@ public class Dashboard extends JFrame {
                 Hibernate.close();
             } else {
                 controllerTeacher.logout(teacherAuth);
+                Hibernate.close();
+                Hibernate.initialize(Application.isProduction);
                 SwingUtilities.invokeLater(() -> new Login().setVisible(true));
             }
         }

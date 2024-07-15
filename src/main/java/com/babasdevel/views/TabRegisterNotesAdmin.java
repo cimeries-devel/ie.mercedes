@@ -91,7 +91,7 @@ public class TabRegisterNotesAdmin extends Tab {
         addComponentToolbar(buttonPdf);
 
         buttonView = new FlatButton();
-        buttonView.setIcon(Icons.ICON_PDF_VIEW);
+        buttonView.setIcon(Icons.ICON_SIAGIE);
         buttonView.setActionCommand("button_view_pdf");
         buttonView.addActionListener(this::actionsToolbar);
         buttonView.setEnabled(false);
@@ -144,24 +144,23 @@ public class TabRegisterNotesAdmin extends Tab {
         switch (event.getActionCommand()) {
             case "button_generate_pdf":
             case "button_view_pdf":
-                processPDF(event);
+//                processPDF(event);
                 break;
             case "button_siagie":
                 Excel excel = new Excel(dashboard);
-                excel.createConsolidatedFull();
-//                Excel excel = new Excel(dashboard);
-//                File file = excel.loadBook();
-//                if (file != null){
-//                    excel.insertNotes(file, (Grade) comboGrade.getSelectedItem());
-//                }
+//                excel.createConsolidatedFull();
+                File[] files = excel.loadBook();
+                if (files != null){
+                    excel.insertNotes(files, (Grade) Objects.requireNonNull(comboGrade.getSelectedItem()));
+                }
                 break;
             default:
                 FlatComboBox combo = (FlatComboBox) event.getSource();
                 if (combo.getSelectedIndex() == 0) {
                     changedTable(null);
                 } else {
-                    buttonPdf.setEnabled(true);
-                    buttonView.setEnabled(buttonPdf.isEnabled());
+//                    buttonPdf.setEnabled(true);
+//                    buttonView.setEnabled(buttonPdf.isEnabled());
                 }
         }
     }

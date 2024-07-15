@@ -23,6 +23,15 @@ public class ControllerSection extends Hibernate {
         section = session.find(Section.class, id, LockModeType.NONE);
         return section;
     }
+    public Section get(String name){
+        criteria = builder.createQuery(Section.class);
+        attributes = criteria.from(Section.class);
+        criteria.select(attributes).where(
+                builder.equal(attributes.get("section"), name)
+        );
+        section = session.createQuery(criteria).getSingleResult();
+        return section;
+    }
     public List<Section> all(){
         criteria = builder.createQuery(Section.class);
         attributes = criteria.from(Section.class);
