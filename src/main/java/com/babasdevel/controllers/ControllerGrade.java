@@ -50,13 +50,14 @@ public class ControllerGrade extends Hibernate {
         grade = session.find(Grade.class, id, LockModeType.NONE);
         return grade;
     }
-    public Grade get(Section section, Classroom classroom){
+    public Grade get(Section section, Classroom classroom, Level level){
         criteria = builder.createQuery(Grade.class);
         attributes = criteria.from(Grade.class);
         criteria.select(attributes).where(
                 builder.and(
                         builder.equal(attributes.get("section"), section),
-                        builder.equal(attributes.get("classroom"), classroom)));
+                        builder.equal(attributes.get("classroom"), classroom),
+                        builder.equal(attributes.get("level"), level)));
         grade = session.createQuery(criteria).getSingleResult();
         return grade;
     }

@@ -439,7 +439,7 @@ public class Excel {
                 ControllerClassroom controllerClassroom = new ControllerClassroom();
                 Section section = controllerSection.get(nameSection);
                 Classroom classroom = controllerClassroom.get(nameClassroom);
-                Grade grade = controllerGrade.get(section, classroom);
+                Grade grade = controllerGrade.get(section, classroom, level);
 
                 controllerCourse.downloadData(dashboard.teacherAuth);
                 controllerCargo.downloadData(dashboard.teacherAuth);

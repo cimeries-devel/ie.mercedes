@@ -60,6 +60,8 @@ runtime {
                                  '--win-menu-group', 'I.E Mercedes',
                                  '--win-shortcut',
                                  '--app-version', '24.7.1']
+            args = ["true"]
+
             installerName = application.getApplicationName()
             installerType = 'exe'
         } else if (currentOS.linux){

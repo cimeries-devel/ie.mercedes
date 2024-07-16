@@ -142,7 +142,7 @@ public class ControllerTeacher extends Hibernate {
             teacher = clientTeacher.teacher;
             return teacher;
         }
-        return teacher;
+        return null;
     }
     public void logout(Teacher teacher){
         clientTeacher.logout(teacher);
