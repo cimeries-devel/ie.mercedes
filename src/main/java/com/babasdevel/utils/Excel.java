@@ -8,6 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellRangeAddressList;
+import org.apache.poi.ss.util.RegionUtil;
+import org.apache.poi.xssf.binary.XSSFBUtils;
 import org.apache.poi.xssf.usermodel.XSSFDataValidationHelper;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -135,7 +137,6 @@ public class Excel {
             sheet.createFreezePane(4, 0);
             Row row = sheet.createRow(0);
             Cell cell = row.createCell(0);
-            cell.setCellStyle(style);
             cell.setCellValue("Institución Educativa:");
             cell = row.createCell(4);
             cell.setCellStyle(style);
@@ -258,6 +259,12 @@ public class Excel {
             sheet.setColumnWidth(1, 3500);
             sheet.setColumnWidth(2, 3500);
             sheet.setColumnWidth(3, 3500);
+            for (CellRangeAddress range : sheet.getMergedRegions()) {
+                RegionUtil.setBorderTop(style.getBorderTop(), range, sheet);
+                RegionUtil.setBorderRight(style.getBorderRight(), range, sheet);
+                RegionUtil.setBorderBottom(style.getBorderBottom(), range, sheet);
+                RegionUtil.setBorderLeft(style.getBorderLeft(), range, sheet);
+            }
         }
     }
     public void querySet(Classroom classroom, Long numPartial){
@@ -511,7 +518,7 @@ public class Excel {
             Note note = controllerNote.get(
                     grade,
                     course,
-                    course.getSkills().getFirst(),
+                    course.getSkills().get(0),
                     partial,
                     teacher,
                     student,
@@ -530,7 +537,7 @@ public class Excel {
             Note note = controllerNote.get(
                     grade,
                     course,
-                    course.getSkills().getLast(),
+                    course.getSkills().get(1),
                     partial,
                     teacher,
                     student,
@@ -567,9 +574,8 @@ public class Excel {
                 FileOutputStream outputStream = new FileOutputStream(file);
                 book.write(outputStream);
                 book.close();
+                outputStream.close();
                 status = true;
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
             } catch (IOException e){
                 e.printStackTrace();
             }

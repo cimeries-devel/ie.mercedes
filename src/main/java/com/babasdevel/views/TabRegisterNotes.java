@@ -6,7 +6,6 @@ import com.babasdevel.controllers.*;
 import com.babasdevel.gallery.Icons;
 import com.babasdevel.models.*;
 import com.babasdevel.utils.Excel;
-import com.babasdevel.worker.WorkerGrade;
 import com.formdev.flatlaf.extras.components.*;
 import com.formdev.flatlaf.icons.FlatDescendingSortIcon;
 import com.intellij.uiDesigner.core.GridConstraints;
@@ -18,17 +17,10 @@ import org.jdesktop.swingx.prompt.PromptSupport;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.plaf.basic.BasicComboBoxUI;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.util.*;
 import java.util.List;
 
@@ -42,7 +34,6 @@ public class TabRegisterNotes extends Tab {
     private JXHyperlink hyperlinkTeacher;
     private final Dashboard dashboard;
     private TableModel.ModelStudent modelStudent;
-    private List<Note> notes;
     private TableRowSorter<TableModel.ModelStudent> sorter;
     private ControllerGrade controllerGrade;
     private ControllerCourse controllerCourse;
@@ -172,6 +163,7 @@ public class TabRegisterNotes extends Tab {
         buttonRefreshNotes.addActionListener(this::actionsToolbar);
         addComponentToolbar(buttonRefreshNotes);
     }
+
     private void processPressKeys(ActionEvent event) {
         int index = table.getSelectedRow();
         if (index == -1) return;
@@ -332,22 +324,22 @@ public class TabRegisterNotes extends Tab {
                     }
                 }
                 if (data.isEmpty()) return;
-                for (NoteModel nm : data){
-                    if (!nm.observation.isEmpty() && (nm.observation.length() > 64 || nm.observation.length() < 11)){
+                for (NoteModel nm : data) {
+                    if (!nm.observation.isEmpty() && (nm.observation.length() > 64 || nm.observation.length() < 11)) {
                         JOptionPane.showMessageDialog(dashboard,
                                 "Las conclusiones descriptivas, mínimo debe contener 11 y máximo 64 carateres",
                                 "Cambios no guardados",
                                 JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-                    if (nm.note.equals("C")){
+                    if (nm.note.equals("C")) {
                         JOptionPane.showMessageDialog(dashboard,
                                 "Una o más notas requieren conclusión descriptiva",
                                 "Cambios no guardados",
                                 JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-                    if (dashboard.teacherAuth.level.getLevel().equalsIgnoreCase("Primaria") && nm.note.equals("B")){
+                    if (dashboard.teacherAuth.level.getLevel().equalsIgnoreCase("Primaria") && nm.note.equals("B")) {
                         JOptionPane.showMessageDialog(dashboard,
                                 "Una o más notas requieren conclusión descriptiva",
                                 "Cambios no guardados",
@@ -398,19 +390,24 @@ public class TabRegisterNotes extends Tab {
                         JOptionPane.INFORMATION_MESSAGE).split(":");
                 switch (index) {
                     case 1:
-                        for (Student student : modelStudent.students) if (student.nl_1.equalsIgnoreCase(value[0])) student.cd_1 = value[1];
+                        for (Student student : modelStudent.students)
+                            if (student.nl_1.equalsIgnoreCase(value[0])) student.cd_1 = value[1];
                         break;
                     case 2:
-                        for (Student student : modelStudent.students) if (student.nl_2.equalsIgnoreCase(value[0])) student.cd_2 = value[1];
+                        for (Student student : modelStudent.students)
+                            if (student.nl_2.equalsIgnoreCase(value[0])) student.cd_2 = value[1];
                         break;
                     case 3:
-                        for (Student student : modelStudent.students) if (student.nl_3.equalsIgnoreCase(value[0])) student.cd_3 = value[1];
+                        for (Student student : modelStudent.students)
+                            if (student.nl_3.equalsIgnoreCase(value[0])) student.cd_3 = value[1];
                         break;
                     case 4:
-                        for (Student student : modelStudent.students) if (student.nl_4.equalsIgnoreCase(value[0])) student.cd_4 = value[1];
+                        for (Student student : modelStudent.students)
+                            if (student.nl_4.equalsIgnoreCase(value[0])) student.cd_4 = value[1];
                         break;
                     default:
-                        for (Student student : modelStudent.students) if (student.nl_5.equalsIgnoreCase(value[0])) student.cd_5 = value[1];
+                        for (Student student : modelStudent.students)
+                            if (student.nl_5.equalsIgnoreCase(value[0])) student.cd_5 = value[1];
                 }
                 table.updateUI();
                 comboInit.setSelectedIndex(0);
@@ -722,4 +719,91 @@ public class TabRegisterNotes extends Tab {
         workerTeacher.execute();
     }
 
+    {
+// GUI initializer generated by IntelliJ IDEA GUI Designer
+// >>> IMPORTANT!! <<<
+// DO NOT EDIT OR ADD ANY CODE HERE!
+        $$$setupUI$$$();
+    }
+
+    /**
+     * Method generated by IntelliJ IDEA GUI Designer
+     * >>> IMPORTANT!! <<<
+     * DO NOT edit this method OR call it in your code!
+     *
+     * @noinspection ALL
+     */
+    private void $$$setupUI$$$() {
+        panel = new JPanel();
+        panel.setLayout(new GridLayoutManager(3, 1, new Insets(5, 0, 5, 0), -1, -1));
+        final JPanel panel1 = new JPanel();
+        panel1.setLayout(new GridLayoutManager(1, 4, new Insets(0, 1, 0, 1), -1, -1));
+        panel.add(panel1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final JPanel panel2 = new JPanel();
+        panel2.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), 1, -1));
+        panel1.add(panel2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final FlatLabel flatLabel1 = new FlatLabel();
+        flatLabel1.setText("Grados:");
+        panel2.add(flatLabel1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        comboGrade = new FlatComboBox();
+        panel2.add(comboGrade, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final JPanel panel3 = new JPanel();
+        panel3.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        panel1.add(panel3, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        fieldSearch = new JXSearchField();
+        fieldSearch.setFocusBehavior(PromptSupport.FocusBehavior.HIGHLIGHT_PROMPT);
+        fieldSearch.setLayoutStyle(JXSearchField.LayoutStyle.VISTA);
+        fieldSearch.setPrompt("Búscar...");
+        panel3.add(fieldSearch, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(250, -1), null, 0, false));
+        final Spacer spacer1 = new Spacer();
+        panel1.add(spacer1, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        final JPanel panel4 = new JPanel();
+        panel4.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), 1, -1));
+        panel1.add(panel4, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final FlatLabel flatLabel2 = new FlatLabel();
+        flatLabel2.setText("Curso:");
+        panel4.add(flatLabel2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        comboCourse = new FlatComboBox();
+        panel4.add(comboCourse, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final JPanel panel5 = new JPanel();
+        panel5.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), 0, 0));
+        panel.add(panel5, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        final FlatScrollPane flatScrollPane1 = new FlatScrollPane();
+        panel5.add(flatScrollPane1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        table = new FlatTable();
+        flatScrollPane1.setViewportView(table);
+        final JPanel panel6 = new JPanel();
+        panel6.setLayout(new GridLayoutManager(1, 4, new Insets(0, 0, 0, 0), -1, -1));
+        panel.add(panel6, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final JPanel panel7 = new JPanel();
+        panel7.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), 1, -1));
+        panel6.add(panel7, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final FlatLabel flatLabel3 = new FlatLabel();
+        flatLabel3.setText("Registros:");
+        panel7.add(flatLabel3, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        hyperlinkCount = new JXHyperlink();
+        hyperlinkCount.setText("-");
+        panel7.add(hyperlinkCount, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final JPanel panel8 = new JPanel();
+        panel8.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        panel6.add(panel8, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer2 = new Spacer();
+        panel6.add(spacer2, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        final JPanel panel9 = new JPanel();
+        panel9.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), 1, -1));
+        panel6.add(panel9, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final FlatLabel flatLabel4 = new FlatLabel();
+        flatLabel4.setText("Docente:");
+        panel9.add(flatLabel4, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        hyperlinkTeacher = new JXHyperlink();
+        hyperlinkTeacher.setText("-");
+        panel9.add(hyperlinkTeacher, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+    }
+
+    /**
+     * @noinspection ALL
+     */
+    public JComponent $$$getRootComponent$$$() {
+        return panel;
+    }
 }

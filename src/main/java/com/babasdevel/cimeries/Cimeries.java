@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import okhttp3.*;
 
+import javax.net.ssl.SSLSocketFactory;
 import java.time.Duration;
 import java.util.Collections;
 
@@ -25,24 +26,21 @@ abstract class Cimeries {
     public Cimeries(){
         host = Application.isProduction ? "https://api.babasdevel.com/v1/" : "http://127.0.0.1:8000/v1/";
         gson = new Gson();
-        if (Application.isProduction) {
-            ConnectionSpec spec = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
-                    .tlsVersions(TlsVersion.TLS_1_2)
-                    .cipherSuites(
-                            CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
-                            CipherSuite.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
-                            CipherSuite.TLS_DHE_RSA_WITH_AES_128_GCM_SHA256)
-                    .build();
 
-            client = new OkHttpClient().newBuilder()
-                    .connectTimeout(TIME_OUT_SECONDS)
-                    .connectionSpecs(Collections.singletonList(spec))
-                    .build();
-        } else {
-            client = new OkHttpClient().newBuilder()
-                    .connectTimeout(TIME_OUT_SECONDS)
-                    .build();
-        }
+        ConnectionSpec spec = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+                .tlsVersions(TlsVersion.TLS_1_2)
+                .cipherSuites(
+                        CipherSuite.TLS_DHE_RSA_WITH_AES_128_GCM_SHA256,
+                        CipherSuite.TLS_DHE_RSA_WITH_AES_256_GCM_SHA384,
+                        CipherSuite.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+                        CipherSuite.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+                        CipherSuite.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256)
+                .build();
+
+        client = new OkHttpClient().newBuilder()
+                .connectTimeout(TIME_OUT_SECONDS)
+                .connectionSpecs(Collections.singletonList(spec))
+                .build();
     }
 
     protected static String getCSRFToken(String value) {

@@ -11,7 +11,7 @@ jar {
 }
 
 group = 'com.babasdevel'
-version = '2023.06'
+version = '2024.07'
 
 repositories {
     mavenCentral()
@@ -49,7 +49,7 @@ application {
 runtime {
     modules = []
     jpackage {
-        jpackageHome = '/home/cimeries/.opt/jdk-17.0.7'
+        jpackageHome = 'C:\\Program Files\\BellSoft\\LibericaJDK-21'
         def currentOS = org.gradle.internal.os.OperatingSystem.current()
         installerOptions += ['--vendor', 'Babas.devel']
         if (currentOS.windows){
@@ -59,7 +59,7 @@ runtime {
                                  '--win-menu',
                                  '--win-menu-group', 'Mercedes',
                                  '--win-shortcut',
-                                 '--app-version', '0.0.1']
+                                 '--app-version', '24.7.1']
             installerName = application.getApplicationName()
             installerType = 'exe'
         } else if (currentOS.linux){
