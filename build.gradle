@@ -57,7 +57,7 @@ runtime {
             installerOptions += ['--icon', 'src/main/resources/com/babasdevel/views/favicon.ico',
                                  '--win-dir-chooser',
                                  '--win-menu',
-                                 '--win-menu-group', 'Mercedes',
+                                 '--win-menu-group', 'I.E Mercedes',
                                  '--win-shortcut',
                                  '--app-version', '24.7.1']
             installerName = application.getApplicationName()

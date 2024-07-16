@@ -427,7 +427,7 @@ public class Excel {
             sheet.autoSizeColumn(1);
         }
     }
-    public void insertNotes(File[] files, Grade grade){
+    public void insertNotes(File[] files, Level level){
         try {
             for (File file : files){
                 Workbook book = new XSSFWorkbook(new FileInputStream(file));
@@ -439,7 +439,7 @@ public class Excel {
                 ControllerClassroom controllerClassroom = new ControllerClassroom();
                 Section section = controllerSection.get(nameSection);
                 Classroom classroom = controllerClassroom.get(nameClassroom);
-                grade = controllerGrade.get(section, classroom);
+                Grade grade = controllerGrade.get(section, classroom);
 
                 controllerCourse.downloadData(dashboard.teacherAuth);
                 controllerCargo.downloadData(dashboard.teacherAuth);

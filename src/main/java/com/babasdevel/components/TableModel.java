@@ -110,40 +110,46 @@ public class TableModel {
                     break;
                 case 9:
                     student.cd_1 = WordUtils.capitalizeFully(value.toString());
-                    int len = student.cd_1.trim().length();
-                    if (len != 0)
-                        if (len < 11 || len > 64) {
-                            JOptionPane.showMessageDialog(
-                                    null,
-                                    "La conclusión ingresa excede la longitud permitida.\nMínimo 11 y máximo 64 carácteres",
-                                    "Error en el valor ingresado",
-                                    JOptionPane.ERROR_MESSAGE);
-                        }
+                    messageDialog(student.cd_1);
                     break;
                 case 10:
                     student.nl_2 = value.toString();
                     break;
                 case 11:
                     student.cd_2 = WordUtils.capitalizeFully(value.toString());
+                    messageDialog(student.cd_2);
                     break;
                 case 12:
                     student.nl_3 = value.toString();
                     break;
                 case 13:
                     student.cd_3 = WordUtils.capitalizeFully(value.toString());
+                    messageDialog(student.cd_3);
                     break;
                 case 14:
                     student.nl_4 = value.toString();
                     break;
                 case 15:
                     student.cd_4 = WordUtils.capitalizeFully(value.toString());
+                    messageDialog(student.cd_4);
                     break;
                 case 16:
                     student.nl_5 = value.toString();
                     break;
                 default:
                     student.cd_5 = WordUtils.capitalizeFully(value.toString());
+                    messageDialog(student.cd_5);
             }
+        }
+        private void messageDialog(String cd){
+            int len = cd.trim().length();
+            if (len != 0)
+                if (len < 11 || len > 64)
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "La conclusión descriptiva ingresada, no es válida.\nEl valor ingresado, debe contener mínimo 11 y máximo 64 carácteres",
+                            "Conclusión descriptiva",
+                            JOptionPane.ERROR_MESSAGE);
         }
         @Override
         public boolean isCellEditable(int row, int col){

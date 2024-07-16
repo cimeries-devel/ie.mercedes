@@ -19,7 +19,7 @@ import java.util.Map;
 public class Application {
     public static boolean isProduction;
     public static void main(String[] args) {
-        isProduction = true;
+        isProduction = Boolean.parseBoolean(args[0]);
         Hibernate.initialize(isProduction);
         initLook();
         SwingUtilities.invokeLater(()-> new Login().setVisible(true));
