@@ -335,14 +335,14 @@ public class TabRegisterNotes extends Tab {
                                 JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-                    if (nm.note.equals("C")) {
+                    if (nm.note.equals("C") && nm.observation.trim().isEmpty()) {
                         JOptionPane.showMessageDialog(dashboard,
                                 "Una o más notas requieren conclusión descriptiva",
                                 "Cambios no guardados",
                                 JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-                    if (dashboard.teacherAuth.level.getLevel().equalsIgnoreCase("Primaria") && nm.note.equals("B")) {
+                    if (dashboard.teacherAuth.level.getLevel().equalsIgnoreCase("Primaria") && nm.note.equals("B") && nm.observation.trim().isEmpty()) {
                         JOptionPane.showMessageDialog(dashboard,
                                 "Una o más notas requieren conclusión descriptiva",
                                 "Cambios no guardados",
