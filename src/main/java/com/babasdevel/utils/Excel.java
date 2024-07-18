@@ -10,9 +10,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.ss.util.RegionUtil;
 import org.apache.poi.xssf.binary.XSSFBUtils;
-import org.apache.poi.xssf.usermodel.XSSFDataValidationHelper;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.*;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -211,12 +209,12 @@ public class Excel {
                     Row rowNlC = sheet.getRow(4);
                     cell = rowNlC.createCell(n);
                     cell.setCellStyle(styleRotate);
-                    cell.setCellValue("NL");
+                    cell.setCellValue(String.format("%d NL", skill.getIndex()));
 //                    sheet.addMergedRegion(new CellRangeAddress(4, 4, n, n));
 
                     cell = rowNlC.createCell(++n);
                     cell.setCellStyle(styleRotateBold);
-                    cell.setCellValue("Conclusión descriptiva");
+                    cell.setCellValue(String.format("%d Conclusión descriptiva", skill.getIndex()));
 //                    sheet.addMergedRegion(new CellRangeAddress(4, 4, n, n));
                     sheet.setColumnWidth(n++, 9000);
                 }
@@ -251,6 +249,17 @@ public class Excel {
                     dataValidation.setSuppressDropDownArrow(true);
                     dataValidation.setShowErrorBox(true);
                     sheet.addValidationData(dataValidation);
+
+                    CellRangeAddressList addressCell = new CellRangeAddressList(5, numRowNote+4, n+1, n+1);
+                    DataValidationConstraint constraintBetween = validationHelper.createNumericConstraint(
+                            DataValidationConstraint.ValidationType.TEXT_LENGTH,
+                            DataValidationConstraint.OperatorType.BETWEEN,
+                            "11", "64");
+                    DataValidation dataValidationText = validationHelper.createValidation(constraintBetween, addressCell);
+                    dataValidationText.setShowErrorBox(true);
+                    dataValidationText.setErrorStyle(DataValidation.ErrorStyle.WARNING);
+                    dataValidationText.createErrorBox("Conclusión descriptiva", "La conclusión descriptiva debe contener mínimo 11 y máximo 64 caracteres.");
+                    sheet.addValidationData(dataValidationText);
                     n += 2;
                 }
             }
