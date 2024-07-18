@@ -72,6 +72,18 @@ public class ControllerCargo extends Hibernate {
         cargo = session.createQuery(criteria).getSingleResultOrNull();
         return cargo;
     }
+    public List<Cargo> get(Teacher teacher, boolean status){
+        criteria = builder.createQuery(Cargo.class);
+        attributes = criteria.from(Cargo.class);
+        criteria.select(attributes).where(
+                builder.and(
+                        builder.equal(attributes.get("teacher"), teacher),
+                        builder.equal(attributes.get("status"), status)
+                )
+        );
+        cargos = session.createQuery(criteria).getResultList();
+        return cargos;
+    }
     public List<Cargo> all(){
         criteria = builder.createQuery(Cargo.class);
         attributes = criteria.from(Cargo.class);

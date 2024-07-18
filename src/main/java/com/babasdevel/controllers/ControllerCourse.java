@@ -54,6 +54,18 @@ public class ControllerCourse extends Hibernate {
         course = session.createQuery(criteria).getSingleResult();
         return course;
     }
+    public Course get(String abbreviation, Level level){
+        criteria = builder.createQuery(Course.class);
+        attributes = criteria.from(Course.class);
+        criteria.select(attributes).where(
+                builder.and(
+                        builder.equal(attributes.get("abbreviation"), abbreviation),
+                        builder.equal(attributes.get("level"), level)
+                )
+        );
+        course = session.createQuery(criteria).getSingleResult();
+        return course;
+    }
     public List<Course> all(Level level){
         criteria = builder.createQuery(Course.class);
         attributes = criteria.from(Course.class);

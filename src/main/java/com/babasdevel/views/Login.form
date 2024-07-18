@@ -40,7 +40,7 @@
                 <properties>
                   <placeholderText value="Ingrese su dni"/>
                   <roundRect value="true"/>
-                  <text value=""/>
+                  <text value="04823918"/>
                 </properties>
               </component>
             </children>
@@ -69,7 +69,7 @@
                 <properties>
                   <placeholderText value="Contraseña"/>
                   <roundRect value="true"/>
-                  <text value=""/>
+                  <text value="localhost"/>
                 </properties>
               </component>
             </children>

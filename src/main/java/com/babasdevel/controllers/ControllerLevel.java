@@ -26,6 +26,15 @@ public class ControllerLevel extends Hibernate {
         level = session.find(Level.class, id, LockModeType.NONE);
         return level;
     }
+    public Level get(String name){
+        criteria = builder.createQuery(Level.class);
+        attributes = criteria.from(Level.class);
+        criteria.select(attributes).where(
+                builder.equal(attributes.get("level"), name)
+        );
+        level = session.createQuery(criteria).getSingleResultOrNull();
+        return level;
+    }
     public Level getOnly(Teacher teacher){
         code = clientLevel.getLevel(teacher);
         if (code == Codes.CODE_SUCCESS) clientLevel.data.save();

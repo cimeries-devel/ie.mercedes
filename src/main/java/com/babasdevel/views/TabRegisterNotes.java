@@ -21,6 +21,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.util.*;
 import java.util.List;
 
@@ -380,7 +381,9 @@ public class TabRegisterNotes extends Tab {
                 }
                 break;
             case "send_template":
-
+                excel = new Excel(dashboard);
+                File file = excel.loadBook();
+                excel.sendNotesOfTemplate(file, dashboard.teacherAuth.level);
                 break;
             case "generate_consolidate":
                 break;

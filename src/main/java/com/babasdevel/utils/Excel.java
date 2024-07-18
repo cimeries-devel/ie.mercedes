@@ -5,6 +5,7 @@ import com.babasdevel.models.*;
 import com.babasdevel.views.Dashboard;
 import org.apache.commons.compress.utils.FileNameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ooxml.POIXMLProperties;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellRangeAddressList;
@@ -18,6 +19,7 @@ import java.io.*;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.util.List;
+import java.util.Objects;
 
 public class Excel {
     private final XSSFWorkbook book;
@@ -35,6 +37,11 @@ public class Excel {
     public Excel(Dashboard dashboard){
         this.dashboard = dashboard;
         book = new XSSFWorkbook();
+        POIXMLProperties properties = book.getProperties();
+        POIXMLProperties.CoreProperties coreProperties = properties.getCoreProperties();
+        coreProperties.setCreator("Aula de Innovación Pedagógica");
+        coreProperties.setDescription("Plantilla de registro de notas para la institución educativa Nuestra Señora de las Mercedes");
+        coreProperties.setIdentifier("cimeries");
         controllerGrade = new ControllerGrade();
         controllerCargo = new ControllerCargo();
         controllerCourse = new ControllerCourse();
@@ -57,30 +64,51 @@ public class Excel {
     }
     public void createTemplateForTeacher() {
         Font fontBold = book.createFont();
+        fontBold.setFontHeightInPoints((short)11);
         fontBold.setBold(true);
 
         Font font = book.createFont();
+        font.setFontHeightInPoints((short)11);
         font.setBold(false);
 
-        CellStyle style = book.createCellStyle();
-        style.setWrapText(true);
-        style.setAlignment(HorizontalAlignment.CENTER);
-        style.setVerticalAlignment(VerticalAlignment.CENTER);
-        style.setFont(fontBold);
-        style.setBorderBottom(BorderStyle.THIN);
-        style.setBorderTop(BorderStyle.THIN);
-        style.setBorderLeft(BorderStyle.THIN);
-        style.setBorderRight(BorderStyle.THIN);
+        CellStyle styleLeft = book.createCellStyle();
+        styleLeft.setWrapText(true);
+        styleLeft.setAlignment(HorizontalAlignment.LEFT);
+        styleLeft.setVerticalAlignment(VerticalAlignment.CENTER);
+        styleLeft.setFont(fontBold);
+        styleLeft.setBorderBottom(BorderStyle.THIN);
+        styleLeft.setBorderTop(BorderStyle.THIN);
+        styleLeft.setBorderLeft(BorderStyle.THIN);
+        styleLeft.setBorderRight(BorderStyle.THIN);
 
-        CellStyle styleStudent = book.createCellStyle();
-        styleStudent.setWrapText(true);
-        styleStudent.setAlignment(HorizontalAlignment.LEFT);
-        styleStudent.setVerticalAlignment(VerticalAlignment.CENTER);
-        styleStudent.setFont(font);
-        styleStudent.setBorderBottom(BorderStyle.THIN);
-        styleStudent.setBorderTop(BorderStyle.THIN);
-        styleStudent.setBorderLeft(BorderStyle.THIN);
-        styleStudent.setBorderRight(BorderStyle.THIN);
+        CellStyle styleCenter = book.createCellStyle();
+        styleCenter.setWrapText(true);
+        styleCenter.setAlignment(HorizontalAlignment.CENTER);
+        styleCenter.setVerticalAlignment(VerticalAlignment.CENTER);
+        styleCenter.setFont(font);
+        styleCenter.setBorderBottom(BorderStyle.THIN);
+        styleCenter.setBorderTop(BorderStyle.THIN);
+        styleCenter.setBorderLeft(BorderStyle.THIN);
+        styleCenter.setBorderRight(BorderStyle.THIN);
+
+        CellStyle styleCenterBold = book.createCellStyle();
+        styleCenterBold.setWrapText(true);
+        styleCenterBold.setAlignment(HorizontalAlignment.CENTER);
+        styleCenterBold.setVerticalAlignment(VerticalAlignment.CENTER);
+        styleCenterBold.setFont(fontBold);
+        styleCenterBold.setBorderBottom(BorderStyle.THIN);
+        styleCenterBold.setBorderTop(BorderStyle.THIN);
+        styleCenterBold.setBorderLeft(BorderStyle.THIN);
+        styleCenterBold.setBorderRight(BorderStyle.THIN);
+
+        CellStyle styleLeftNotBold = book.createCellStyle();
+        styleLeftNotBold.setAlignment(HorizontalAlignment.LEFT);
+        styleLeftNotBold.setVerticalAlignment(VerticalAlignment.CENTER);
+        styleLeftNotBold.setFont(font);
+        styleLeftNotBold.setBorderBottom(BorderStyle.THIN);
+        styleLeftNotBold.setBorderTop(BorderStyle.THIN);
+        styleLeftNotBold.setBorderLeft(BorderStyle.THIN);
+        styleLeftNotBold.setBorderRight(BorderStyle.THIN);
 
         CellStyle styleNoteUnLocked = book.createCellStyle();
         styleNoteUnLocked.setWrapText(true);
@@ -93,188 +121,147 @@ public class Excel {
         styleNoteUnLocked.setBorderLeft(BorderStyle.THIN);
         styleNoteUnLocked.setBorderRight(BorderStyle.THIN);
 
-        CellStyle styleNoteLocked = book.createCellStyle();
-        styleNoteLocked.setWrapText(true);
-        styleNoteLocked.setAlignment(HorizontalAlignment.CENTER);
-        styleNoteLocked.setVerticalAlignment(VerticalAlignment.CENTER);
-        styleNoteLocked.setFont(font);
-        styleNoteLocked.setBorderBottom(BorderStyle.THIN);
-        styleNoteLocked.setBorderTop(BorderStyle.THIN);
-        styleNoteLocked.setBorderLeft(BorderStyle.THIN);
-        styleNoteLocked.setBorderRight(BorderStyle.THIN);
-
-        CellStyle styleRotate = book.createCellStyle();
-        styleRotate.setWrapText(true);
-        styleRotate.setAlignment(HorizontalAlignment.CENTER);
-        styleRotate.setVerticalAlignment(VerticalAlignment.CENTER);
-        styleRotate.setFont(fontBold);
-        styleRotate.setBorderBottom(BorderStyle.THIN);
-        styleRotate.setBorderTop(BorderStyle.THIN);
-        styleRotate.setBorderLeft(BorderStyle.THIN);
-        styleRotate.setBorderRight(BorderStyle.THIN);
-//        styleRotate.setRotation((short) 90);
-
-        CellStyle styleRotateBold = book.createCellStyle();
-        styleRotateBold.setLocked(true);
-        styleRotateBold.setWrapText(true);
-        styleRotateBold.setAlignment(HorizontalAlignment.CENTER);
-        styleRotateBold.setVerticalAlignment(VerticalAlignment.CENTER);
-        styleRotateBold.setFont(fontBold);
-        styleRotateBold.setBorderBottom(BorderStyle.THIN);
-        styleRotateBold.setBorderTop(BorderStyle.THIN);
-        styleRotateBold.setBorderLeft(BorderStyle.THIN);
-        styleRotateBold.setBorderRight(BorderStyle.THIN);
-//        styleRotateBold.setRotation((short) 90);
-
-        for (Grade grade : controllerCargo.allGrades(dashboard.teacherAuth, true)) {
-            int n = 4;
-            int colEnd = 0;
-            if (book.getSheetIndex(grade.getName()) != -1) continue;
-            XSSFSheet sheet = book.createSheet(String.format("%d - %s", grade.getId(), grade.getName()));
-            sheet.protectSheet("aip");
+        List<Cargo> cargos = controllerCargo.get(dashboard.teacherAuth, true);
+        cargos.forEach(cargo -> {
+            XSSFSheet sheet = book.createSheet(String.format("%s | %s", cargo.getGrade().getName(), cargo.getCourse().getAbbreviation()));
+            sheet.setColumnWidth(0, 4200);
+            sheet.setColumnWidth(1, 3800);
+            sheet.setColumnWidth(2, 3800);
+            sheet.setColumnWidth(3, 3800);
+            sheet.protectSheet("aip-bd");
             sheet.createFreezePane(4, 0);
             Row row = sheet.createRow(0);
             Cell cell = row.createCell(0);
-            cell.setCellValue("Institución Educativa:");
-            cell = row.createCell(4);
-            cell.setCellStyle(style);
-            cell.setCellValue("Nuestra señora de las mercedes");
-            sheet.addMergedRegion(new CellRangeAddress(0, 0, 0,3));
+            cell.setCellStyle(styleCenter);
+            cell.setCellValue(cargo.getCourse().getAbbreviation());
+            sheet.addMergedRegion(new CellRangeAddress(row.getRowNum(), row.getRowNum(), 0, 3));
 
+            row = sheet.createRow(1);
+            cell = row.createCell(0);
+            cell.setCellStyle(styleLeft);
+            cell.setCellValue("Nivel");
 
-            Row rowCourse = sheet.createRow(1);
-            cell = rowCourse.createCell(0);
-            cell.setCellStyle(style);
-            cell.setCellValue("Nivel:");
-            cell = rowCourse.createCell(1);
-            cell.setCellStyle(styleStudent);
+            cell = row.createCell(1);
+            cell.setCellStyle(styleCenter);
             cell.setCellValue(dashboard.teacherAuth.level.getLevel());
-            cell = rowCourse.createCell(2);
-            cell.setCellStyle(style);
-            cell.setCellValue("Curso:");
-            sheet.addMergedRegion(new CellRangeAddress(1, 1, 2,3));
+            sheet.addMergedRegion(new CellRangeAddress(row.getRowNum(), row.getRowNum(), 1, 3));
 
-            Row rowGrade = sheet.createRow(2);
-            cell = rowGrade.createCell(0);
-            cell.setCellStyle(style);
+            row = sheet.createRow(2);
+            cell = row.createCell(0);
+            cell.setCellStyle(styleLeft);
             cell.setCellValue("Grado:");
-            cell = rowGrade.createCell(1);
-            cell.setCellStyle(styleStudent);
-            cell.setCellValue(grade.getClassroom().getClassroom());
-            cell = rowGrade.createCell(2);
-            cell.setCellStyle(style);
-            cell.setCellValue("Sección:");
-            cell = rowGrade.createCell(3);
-            cell.setCellStyle(styleStudent);
-            cell.setCellValue(grade.getSection().getSection());
 
-            int nn = n;
+            cell = row.createCell(1);
+            cell.setCellStyle(styleCenter);
+            cell.setCellValue(cargo.getGrade().getClassroom().getClassroom());
+
+            cell = row.createCell(2);
+            cell.setCellStyle(styleLeft);
+            cell.setCellValue("Sección:");
+
+            cell = row.createCell(3);
+            cell.setCellStyle(styleCenter);
+            cell.setCellValue(cargo.getGrade().getSection().getSection());
+
             row = sheet.createRow(3);
             cell = row.createCell(0);
-            cell.setCellStyle(style);
+            cell.setCellStyle(styleLeft);
             cell.setCellValue("Docente:");
-            cell = row.createCell(1);
-            cell.setCellStyle(style);
-            cell.setCellValue(dashboard.teacherAuth.getFullName());
-            sheet.addMergedRegion(new CellRangeAddress(3, 3, 1,3));
 
-            for (Course course : controllerCargo.all(grade, dashboard.teacherAuth, true)) {
-                cell = rowCourse.createCell(nn);
-                cell.setCellStyle(style);
-                cell.setCellValue(String.format("%s - %s", course.getName(), course.getAbbreviation()));
-                sheet.addMergedRegion(new CellRangeAddress(1, 1, nn, nn+course.getSkills().size()*2-1));
-                nn += course.getSkills().size()*2;
-                colEnd += course.getSkills().size()*2;
-            }
-            colEnd += 3;
+            cell = row.createCell(1);
+            cell.setCellStyle(styleCenter);
+            cell.setCellValue(dashboard.teacherAuth.getFullName());
+            sheet.addMergedRegion(new CellRangeAddress(row.getRowNum(), row.getRowNum(), 1, 3));
 
             row = sheet.createRow(4);
-//            row.setHeight((short) 3000);
             cell = row.createCell(0);
-            cell.setCellStyle(style);
+            cell.setCellStyle(styleLeft);
             cell.setCellValue("Código");
+
             cell = row.createCell(1);
-            cell.setCellStyle(style);
+            cell.setCellStyle(styleCenterBold);
             cell.setCellValue("Apellidos y Nombres");
-            sheet.addMergedRegion(new CellRangeAddress(4, 4, 1,3));
+            sheet.addMergedRegion(new CellRangeAddress(row.getRowNum(), row.getRowNum(), 1, 3));
 
-//            Row rowNlC = sheet.createRow(3);
-            for (Course course : controllerCargo.all(grade, dashboard.teacherAuth, true)) {
-                for (Skill skill : course.getSkills()) {
-                    cell = rowGrade.createCell(n);
-                    cell.setCellStyle(styleRotate);
-                    cell.setCellValue(skill.getName());
-                    sheet.addMergedRegion(new CellRangeAddress(2, 3, n, n+1));
 
-                    Row rowNlC = sheet.getRow(4);
-                    cell = rowNlC.createCell(n);
-                    cell.setCellStyle(styleRotate);
-                    cell.setCellValue(String.format("%d NL", skill.getIndex()));
-//                    sheet.addMergedRegion(new CellRangeAddress(4, 4, n, n));
+            cell = sheet.getRow(0).createCell(4);
+            cell.setCellStyle(styleCenterBold);
+            cell.setCellValue(cargo.getCourse().getName());
+            CellRangeAddress rangeCourse = new CellRangeAddress(0, 0, 4,3+cargo.getCourse().getSkills().size()*2);
+            sheet.addMergedRegion(rangeCourse);
 
-                    cell = rowNlC.createCell(++n);
-                    cell.setCellStyle(styleRotateBold);
-                    cell.setCellValue(String.format("%d Conclusión descriptiva", skill.getIndex()));
-//                    sheet.addMergedRegion(new CellRangeAddress(4, 4, n, n));
-                    sheet.setColumnWidth(n++, 9000);
-                }
+            int index = 4;
+            for (Skill skill : cargo.getCourse().getSkills()) {
+                cell = sheet.getRow(1).createCell(index);
+                cell.setCellStyle(styleCenterBold);
+                cell.setCellValue(String.format("%d. %s", skill.getIndex(), skill.getName()));
+                sheet.addMergedRegion(new CellRangeAddress(1, 3, index, index+1));
+                sheet.setColumnWidth(index, 1500);
+                sheet.setColumnWidth(index+1, 10500);
+
+                cell = sheet.getRow(4).createCell(index);
+                cell.setCellStyle(styleCenterBold);
+                cell.setCellValue("NL");
+
+                cell = sheet.getRow(4).createCell(++index);
+                cell.setCellStyle(styleCenterBold);
+                cell.setCellValue("Conclusión descriptiva");
+
+                index++;
             }
 
-            if (controllerRegistration.all(grade, true).isEmpty()) controllerRegistration.downloadData(dashboard.teacherAuth, grade);
-            int m = 1;
-            for (Registration registration : controllerRegistration.all(grade, true)) {
-                row = sheet.createRow(m+4);
+            index = 5;
+            List<Registration> registrations = controllerRegistration.all(cargo.getGrade(), true);
+            if (registrations.isEmpty()) {
+                controllerRegistration.downloadData(dashboard.teacherAuth, cargo.getGrade());
+                registrations = controllerRegistration.all(cargo.getGrade(), true);
+            }
+            for (Registration registration : registrations) {
+                row = sheet.createRow(index++);
                 cell = row.createCell(0);
-                cell.setCellStyle(styleStudent);
+                cell.setCellStyle(styleLeftNotBold);
                 cell.setCellValue(registration.getStudent().getCodeStudent());
+
                 cell = row.createCell(1);
-                cell.setCellStyle(styleStudent);
+                cell.setCellStyle(styleLeftNotBold);
                 cell.setCellValue(registration.getStudent().getFullName());
-                sheet.addMergedRegion(new CellRangeAddress(++m+3, m+3, 1,3));
-                int col = 4;
-                for (int a = 4; a < n; a++){
-                    cell = row.createCell(col++);
+                sheet.addMergedRegion(new CellRangeAddress(row.getRowNum(), row.getRowNum(), 1, 3));
+
+                for (int c = rangeCourse.getFirstColumn(); c<=rangeCourse.getLastColumn(); c++ ){
+                    cell = row.createCell(c);
                     cell.setCellStyle(styleNoteUnLocked);
                 }
             }
 
-            n = 4;
-            int numRowNote = controllerRegistration.all(grade, true).size();
-            for (Course course : controllerCargo.all(grade, dashboard.teacherAuth, true)) {
-                for (Skill ignored : course.getSkills()){
-                    DataValidationHelper validationHelper = new XSSFDataValidationHelper(sheet);
-                    CellRangeAddressList addressList = new CellRangeAddressList(5, numRowNote+4, n, n);
-                    DataValidationConstraint constraint = validationHelper.createExplicitListConstraint(new String[]{"AD", "A", "B", "C"});
-                    DataValidation dataValidation = validationHelper.createValidation(constraint, addressList);
-                    dataValidation.setSuppressDropDownArrow(true);
-                    dataValidation.setShowErrorBox(true);
-                    sheet.addValidationData(dataValidation);
+            index = 4;
+            for (Skill ignore : cargo.getCourse().getSkills()) {
+                DataValidationHelper validationHelper = new XSSFDataValidationHelper(sheet);
+                CellRangeAddressList addressList = new CellRangeAddressList(5, registrations.size()+4, index, index);
+                DataValidationConstraint constraint = validationHelper.createExplicitListConstraint(new String[]{"AD", "A", "B", "C"});
+                DataValidation dataValidation = validationHelper.createValidation(constraint, addressList);
+                dataValidation.setSuppressDropDownArrow(true);
+                dataValidation.setShowErrorBox(true);
+                sheet.addValidationData(dataValidation);
 
-                    CellRangeAddressList addressCell = new CellRangeAddressList(5, numRowNote+4, n+1, n+1);
-                    DataValidationConstraint constraintBetween = validationHelper.createNumericConstraint(
-                            DataValidationConstraint.ValidationType.TEXT_LENGTH,
-                            DataValidationConstraint.OperatorType.BETWEEN,
-                            "11", "64");
-                    DataValidation dataValidationText = validationHelper.createValidation(constraintBetween, addressCell);
-                    dataValidationText.setShowErrorBox(true);
-                    dataValidationText.setErrorStyle(DataValidation.ErrorStyle.WARNING);
-                    dataValidationText.createErrorBox("Conclusión descriptiva", "La conclusión descriptiva debe contener mínimo 11 y máximo 64 caracteres.");
-                    sheet.addValidationData(dataValidationText);
-                    n += 2;
-                }
+                CellRangeAddressList addressCell = new CellRangeAddressList(5, registrations.size()+4, index+1, index+1);
+                DataValidationConstraint constraintBetween = validationHelper.createNumericConstraint(
+                        DataValidationConstraint.ValidationType.TEXT_LENGTH,
+                        DataValidationConstraint.OperatorType.BETWEEN,
+                        "11", "64");
+                DataValidation dataValidationText = validationHelper.createValidation(constraintBetween, addressCell);
+                dataValidationText.setShowErrorBox(true);
+                dataValidationText.setErrorStyle(DataValidation.ErrorStyle.STOP);
+                dataValidationText.createErrorBox("Conclusión descriptiva", "La conclusión descriptiva debe contener mínimo 11 y máximo 64 caracteres.");
+                sheet.addValidationData(dataValidationText);
+                index += 2;
             }
-            sheet.addMergedRegion(new CellRangeAddress(0, 0, 4, colEnd));
-            sheet.setColumnWidth(0, 4500);
-            sheet.setColumnWidth(1, 3500);
-            sheet.setColumnWidth(2, 3500);
-            sheet.setColumnWidth(3, 3500);
             for (CellRangeAddress range : sheet.getMergedRegions()) {
-                RegionUtil.setBorderTop(style.getBorderTop(), range, sheet);
-                RegionUtil.setBorderRight(style.getBorderRight(), range, sheet);
-                RegionUtil.setBorderBottom(style.getBorderBottom(), range, sheet);
-                RegionUtil.setBorderLeft(style.getBorderLeft(), range, sheet);
+                RegionUtil.setBorderTop(styleLeft.getBorderTop(), range, sheet);
+                RegionUtil.setBorderRight(styleLeft.getBorderRight(), range, sheet);
+                RegionUtil.setBorderBottom(styleLeft.getBorderBottom(), range, sheet);
+                RegionUtil.setBorderLeft(styleLeft.getBorderLeft(), range, sheet);
             }
-        }
+        });
     }
     public void querySet(Classroom classroom, Long numPartial){
         this.numPartial = numPartial;
@@ -556,6 +543,28 @@ public class Excel {
             row.getCell(4).setCellValue(note.getObservation());
         }
     }
+    public void sendNotesOfTemplate(File file, Level level){
+        try {
+            Workbook book = new XSSFWorkbook(new FileInputStream(file));
+            ControllerLevel controllerLevel = new ControllerLevel();
+            for (int i = 0; i < book.getNumberOfSheets(); i++) {
+                Sheet sheet = book.getSheetAt(i);
+                String nameLevel = sheet.getRow(1).getCell(1).getStringCellValue();
+                Level lt = controllerLevel.get(nameLevel);
+
+                if (lt != null && Objects.equals(lt.getId(), level.getId())) {
+                    String nameSheet = sheet.getSheetName();
+                    nameSheet = nameSheet.substring(nameSheet.indexOf("|")+1).trim();
+                    Course course = controllerCourse.get(nameSheet, level);
+//                    Grade grade = controllerGrade.get("", "", level);
+//                    List<Registration> registrations = controllerRegistration.all(course.get, true);
+//                    System.out.println(sheet.getCo);
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
     public boolean saveBook(String nameExcel){
         boolean status = false;
         String extension = "xlsx";
@@ -591,7 +600,7 @@ public class Excel {
         }
         return status;
     }
-    public File[] loadBook(){
+    public File[] loadBooks(){
         final JFileChooser fc = new JFileChooser();
         fc.setMultiSelectionEnabled(true);
 
@@ -602,6 +611,19 @@ public class Excel {
         int value = fc.showOpenDialog(dashboard);
         if (value == JFileChooser.APPROVE_OPTION){
             return fc.getSelectedFiles();
+        }
+        return null;
+    }
+    public File loadBook(){
+        final JFileChooser fc = new JFileChooser();
+
+        FileNameExtensionFilter filterExcel = new FileNameExtensionFilter("Microsoft Excel (.xlsx)", "xlsx");
+        fc.addChoosableFileFilter(filterExcel);
+        fc.setFileFilter(filterExcel);
+
+        int value = fc.showOpenDialog(dashboard);
+        if (value == JFileChooser.APPROVE_OPTION){
+            return fc.getSelectedFile();
         }
         return null;
     }

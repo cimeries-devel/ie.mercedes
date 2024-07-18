@@ -149,7 +149,7 @@ public class TabRegisterNotesAdmin extends Tab {
             case "button_siagie":
                 Excel excel = new Excel(dashboard);
 //                excel.createConsolidatedFull();
-                File[] files = excel.loadBook();
+                File[] files = excel.loadBooks();
                 if (files != null) {
                     excel.insertNotes(files, dashboard.permission.getLevel());
                 }
