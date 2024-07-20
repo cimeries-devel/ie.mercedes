@@ -19,6 +19,7 @@ import java.io.*;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 public class Excel {
@@ -241,6 +242,8 @@ public class Excel {
                 DataValidation dataValidation = validationHelper.createValidation(constraint, addressList);
                 dataValidation.setSuppressDropDownArrow(true);
                 dataValidation.setShowErrorBox(true);
+                dataValidation.setErrorStyle(DataValidation.ErrorStyle.STOP);
+                dataValidation.createErrorBox("Nivel de logro", "El nivel de logro ingresado no es válido, sólo se acepta: AD, A, B o C");
                 sheet.addValidationData(dataValidation);
 
                 CellRangeAddressList addressCell = new CellRangeAddressList(5, registrations.size()+4, index+1, index+1);
@@ -547,19 +550,35 @@ public class Excel {
         try {
             Workbook book = new XSSFWorkbook(new FileInputStream(file));
             ControllerLevel controllerLevel = new ControllerLevel();
+            ControllerClassroom controllerClassroom = new ControllerClassroom();
+            ControllerSection controllerSection = new ControllerSection();
             for (int i = 0; i < book.getNumberOfSheets(); i++) {
                 Sheet sheet = book.getSheetAt(i);
                 String nameLevel = sheet.getRow(1).getCell(1).getStringCellValue();
                 Level lt = controllerLevel.get(nameLevel);
 
                 if (lt != null && Objects.equals(lt.getId(), level.getId())) {
+                    String classroomName = sheet.getRow(2).getCell(1).getStringCellValue();
+                    String sectionName = sheet.getRow(2).getCell(3).getStringCellValue();
+                    Classroom classroom = controllerClassroom.get(classroomName);
+                    Section section = controllerSection.get(sectionName);
+
                     String nameSheet = sheet.getSheetName();
                     nameSheet = nameSheet.substring(nameSheet.indexOf("|")+1).trim();
                     Course course = controllerCourse.get(nameSheet, level);
-//                    Grade grade = controllerGrade.get("", "", level);
-//                    List<Registration> registrations = controllerRegistration.all(course.get, true);
-//                    System.out.println(sheet.getCo);
+                    Grade grade = controllerGrade.get(section, classroom, level);
+                    List<Registration> registrations = controllerRegistration.all(grade, true);
+                    if (registrations.isEmpty()){
+                        controllerRegistration.downloadData(dashboard.teacherAuth, grade);
+                        registrations = controllerRegistration.all(grade, true);
+                    }
+                    for (int indexRow = 5; indexRow <= sheet.getLastRowNum(); indexRow++) {
+                        Row row = sheet.getRow(indexRow);
+                        Student student = controllerStudent.get(row.getCell(0).getStringCellValue());
+                        System.out.println(student.getFirstName());
+                    }
                 }
+                break;
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
