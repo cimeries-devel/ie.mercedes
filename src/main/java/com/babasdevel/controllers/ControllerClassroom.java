@@ -32,7 +32,7 @@ public class ControllerClassroom extends Hibernate{
         criteria.select(attributes).where(
                 builder.equal(builder.upper(attributes.get("classroom")), name.toUpperCase())
         );
-        classroom = session.createQuery(criteria).getSingleResult();
+        classroom = session.createQuery(criteria).getSingleResultOrNull();
         return classroom;
     }
     public List<Classroom> all(){

@@ -63,7 +63,7 @@ public class ControllerCourse extends Hibernate {
                         builder.equal(attributes.get("level"), level)
                 )
         );
-        course = session.createQuery(criteria).getSingleResult();
+        course = session.createQuery(criteria).getSingleResultOrNull();
         return course;
     }
     public List<Course> all(Level level){

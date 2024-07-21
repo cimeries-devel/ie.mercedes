@@ -58,7 +58,7 @@ public class ControllerGrade extends Hibernate {
                         builder.equal(attributes.get("section"), section),
                         builder.equal(attributes.get("classroom"), classroom),
                         builder.equal(attributes.get("level"), level)));
-        grade = session.createQuery(criteria).getSingleResult();
+        grade = session.createQuery(criteria).getSingleResultOrNull();
         return grade;
     }
     public List<Grade> all(Level level){

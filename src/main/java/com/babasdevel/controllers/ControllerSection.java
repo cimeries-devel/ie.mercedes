@@ -29,7 +29,7 @@ public class ControllerSection extends Hibernate {
         criteria.select(attributes).where(
                 builder.equal(attributes.get("section"), name)
         );
-        section = session.createQuery(criteria).getSingleResult();
+        section = session.createQuery(criteria).getSingleResultOrNull();
         return section;
     }
     public List<Section> all(){

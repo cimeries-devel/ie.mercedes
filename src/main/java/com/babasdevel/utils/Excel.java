@@ -1,5 +1,6 @@
 package com.babasdevel.utils;
 
+import com.babasdevel.cimeries.Codes;
 import com.babasdevel.controllers.*;
 import com.babasdevel.models.*;
 import com.babasdevel.views.Dashboard;
@@ -18,12 +19,13 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
 public class Excel {
-    private final XSSFWorkbook book;
+    private XSSFWorkbook book;
     private List<Grade> grades;
     private Long numPartial;
     private final Dashboard dashboard;
@@ -548,40 +550,115 @@ public class Excel {
     }
     public void sendNotesOfTemplate(File file, Level level){
         try {
-            Workbook book = new XSSFWorkbook(new FileInputStream(file));
-            ControllerLevel controllerLevel = new ControllerLevel();
-            ControllerClassroom controllerClassroom = new ControllerClassroom();
-            ControllerSection controllerSection = new ControllerSection();
-            for (int i = 0; i < book.getNumberOfSheets(); i++) {
-                Sheet sheet = book.getSheetAt(i);
-                String nameLevel = sheet.getRow(1).getCell(1).getStringCellValue();
-                Level lt = controllerLevel.get(nameLevel);
-
-                if (lt != null && Objects.equals(lt.getId(), level.getId())) {
-                    String classroomName = sheet.getRow(2).getCell(1).getStringCellValue();
-                    String sectionName = sheet.getRow(2).getCell(3).getStringCellValue();
-                    Classroom classroom = controllerClassroom.get(classroomName);
-                    Section section = controllerSection.get(sectionName);
-
-                    String nameSheet = sheet.getSheetName();
-                    nameSheet = nameSheet.substring(nameSheet.indexOf("|")+1).trim();
-                    Course course = controllerCourse.get(nameSheet, level);
-                    Grade grade = controllerGrade.get(section, classroom, level);
-                    List<Registration> registrations = controllerRegistration.all(grade, true);
-                    if (registrations.isEmpty()){
-                        controllerRegistration.downloadData(dashboard.teacherAuth, grade);
-                        registrations = controllerRegistration.all(grade, true);
-                    }
-                    for (int indexRow = 5; indexRow <= sheet.getLastRowNum(); indexRow++) {
-                        Row row = sheet.getRow(indexRow);
-                        Student student = controllerStudent.get(row.getCell(0).getStringCellValue());
-                        System.out.println(student.getFirstName());
-                    }
-                }
-                break;
-            }
+            book = new XSSFWorkbook(new FileInputStream(file));
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+        ControllerLevel controllerLevel = new ControllerLevel();
+        ControllerClassroom controllerClassroom = new ControllerClassroom();
+        ControllerSection controllerSection = new ControllerSection();
+
+        List<NoteModel> notes = new ArrayList<>();
+        for (int i = 0; i < book.getNumberOfSheets(); i++) {
+            Sheet sheet = book.getSheetAt(i);
+            String nameLevel = sheet.getRow(1).getCell(1).getStringCellValue();
+            Level lt = controllerLevel.get(nameLevel);
+
+            if (lt != null && Objects.equals(lt.getId(), level.getId())) {
+                String classroomName = sheet.getRow(2).getCell(1).getStringCellValue();
+                String sectionName = sheet.getRow(2).getCell(3).getStringCellValue();
+
+                Classroom classroom = controllerClassroom.get(classroomName);
+
+                Section section = controllerSection.get(sectionName);
+
+                String nameSheet = sheet.getSheetName();
+                nameSheet = nameSheet.substring(nameSheet.indexOf("|")+1).trim();
+                Course course = controllerCourse.get(nameSheet, level);
+
+                Grade grade = controllerGrade.get(section, classroom, level);
+
+                Cargo cargo = controllerCargo.get(grade, course, true);
+                if (cargo == null){
+                    controllerCargo.downloadCargo(dashboard.teacherAuth, grade, course);
+                    cargo = controllerCargo.get(grade, course, true);
+                }
+
+                List<Registration> registrations = controllerRegistration.all(grade, true);
+                if (registrations.isEmpty()){
+                    controllerRegistration.downloadData(dashboard.teacherAuth, grade);
+                    registrations = controllerRegistration.all(grade, true);
+                }
+                for (int indexRow = 5; indexRow <= sheet.getLastRowNum(); indexRow++) {
+                    Row row = sheet.getRow(indexRow);
+                    Student student = controllerStudent.get(row.getCell(0).getStringCellValue());
+
+                    for (int col = 0; col < course.getSkills().size()*2; col+=2){
+                        String n = row.getCell(4+col).getStringCellValue();
+                        String o = row.getCell(5+col).getStringCellValue();
+
+                        if (!o.isEmpty() && (o.length() > 64 || o.length() < 11)) {
+                            JOptionPane.showMessageDialog(dashboard,
+                                    "La conclusión descriptiva ingresada, no es válida.\n" +
+                                            "El valor ingresado, debe contener mínimo 11 y máximo 64 carácteres.\n" +
+                                            grade.getName()+" : "+ course.getName()+"\n" +
+                                            "Alumna(o): "+student.getFullName(),
+                                    "Cambios no guardados",
+                                    JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                        if (n.equals("C") && o.trim().isEmpty()) {
+                            JOptionPane.showMessageDialog(dashboard,
+                                    "La conclusión descriptiva ingresada, no es válida.\n" +
+                                            "El valor ingresado, debe contener mínimo 11 y máximo 64 carácteres.\n" +
+                                            grade.getName()+" : "+ course.getName()+"\n" +
+                                            "Alumna(o): "+student.getFullName(),
+                                    "Cambios no guardados",
+                                    JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                        if (dashboard.teacherAuth.level.getLevel().equalsIgnoreCase("Primaria") && n.equals("B") && o.trim().isEmpty()) {
+                            JOptionPane.showMessageDialog(dashboard,
+                                    "La conclusión descriptiva ingresada, no es válida.\n" +
+                                            "El valor ingresado, debe contener mínimo 11 y máximo 64 carácteres.\n" +
+                                            grade.getName()+" : "+ course.getName()+"\n" +
+                                            "Alumna(o): "+student.getFullName(),
+                                    "Cambios no guardados",
+                                    JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+
+                        NoteModel note = new NoteModel();
+                        note.grade = grade.getId();
+                        note.course = course.getId();
+                        note.teacher = cargo.getTeacher().getId();
+                        note.student = student.getId();
+                        note.partial = dashboard.permission.getPartial();
+                        note.note = n;
+                        note.observation = o;
+                        note.skill = switch (col){
+                            case 0 -> 1L;
+                            case 2 -> 2L;
+                            case 4 -> 3L;
+                            case 6 -> 4L;
+                            default -> 5L;
+                        };
+                        notes.add(note);
+                    }
+                }
+            }
+        }
+        int code = controllerNote.post(dashboard.teacherAuth, notes);
+        if (code == Codes.CODE_CREATED) {
+            JOptionPane.showMessageDialog(dashboard,
+                    "Las notas, han sido registradas correctamente",
+                    "Notas registradas",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(dashboard,
+                    "Las notas, no han sido registradas.",
+                    "Notas no registradas",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
     public boolean saveBook(String nameExcel){
