@@ -383,7 +383,7 @@ public class TabRegisterNotes extends Tab {
             case "send_template":
                 excel = new Excel(dashboard);
                 File file = excel.loadBook();
-                excel.sendNotesOfTemplate(file, dashboard.teacherAuth.level);
+                if (file != null) excel.sendNotesOfTemplate(file, dashboard.teacherAuth.level);
                 break;
             case "generate_consolidate":
                 break;
