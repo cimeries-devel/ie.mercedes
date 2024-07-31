@@ -1,20 +1,10 @@
 package com.babasdevel.mercedes;
 
 import com.babasdevel.common.Hibernate;
-import com.babasdevel.models.ModelReport;
 import com.babasdevel.views.Login;
 import com.formdev.flatlaf.FlatIntelliJLaf;
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-import net.sf.jasperreports.engine.util.JRLoader;
-import net.sf.jasperreports.view.JasperViewer;
-
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class Application {
     public static boolean isProduction;

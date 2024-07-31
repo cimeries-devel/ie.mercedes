@@ -48,13 +48,13 @@ public class ControllerSkill extends Hibernate {
         skill = session.find(Skill.class, id, LockModeType.NONE);
         return skill;
     }
-    public Skill get(Course course, int numberSkill){
+    public Skill get(Course course, int index){
         criteria = builder.createQuery(Skill.class);
         attributes = criteria.from(Skill.class);
         criteria.select(attributes).where(
                 builder.and(
                         builder.equal(attributes.get("course"), course),
-                        builder.equal(attributes.get("index"), numberSkill)
+                        builder.equal(attributes.get("index"), index)
                 )
         );
         skill = session.createQuery(criteria).getSingleResult();

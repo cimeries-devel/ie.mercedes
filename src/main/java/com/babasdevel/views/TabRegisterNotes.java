@@ -386,6 +386,15 @@ public class TabRegisterNotes extends Tab {
                 if (file != null) excel.sendNotesOfTemplate(file, dashboard.teacherAuth.level);
                 break;
             case "generate_consolidate":
+                excel = new Excel(dashboard);
+                excel.createTemplateForTeacherWithNotes();
+                name = String.format("Consolidado %s %s", dashboard.teacherAuth.getLastName(), dashboard.teacherAuth.getFirstName());
+                if (excel.saveBook(name.replace(" ", "_"))) {
+                    JOptionPane.showMessageDialog(dashboard,
+                            "Consolidado generado correctamente.",
+                            "Generar consolidado",
+                            JOptionPane.INFORMATION_MESSAGE);
+                }
                 break;
             case "init_notes":
                 int index = comboInit.getSelectedIndex();

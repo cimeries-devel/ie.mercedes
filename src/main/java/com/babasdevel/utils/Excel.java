@@ -268,6 +268,217 @@ public class Excel {
             }
         });
     }
+    public void createTemplateForTeacherWithNotes() {
+        Font fontBold = book.createFont();
+        fontBold.setFontHeightInPoints((short)11);
+        fontBold.setBold(true);
+
+        Font font = book.createFont();
+        font.setFontHeightInPoints((short)11);
+        font.setBold(false);
+
+        CellStyle styleLeft = book.createCellStyle();
+        styleLeft.setWrapText(true);
+        styleLeft.setAlignment(HorizontalAlignment.LEFT);
+        styleLeft.setVerticalAlignment(VerticalAlignment.CENTER);
+        styleLeft.setFont(fontBold);
+        styleLeft.setBorderBottom(BorderStyle.THIN);
+        styleLeft.setBorderTop(BorderStyle.THIN);
+        styleLeft.setBorderLeft(BorderStyle.THIN);
+        styleLeft.setBorderRight(BorderStyle.THIN);
+
+        CellStyle styleCenter = book.createCellStyle();
+        styleCenter.setWrapText(true);
+        styleCenter.setAlignment(HorizontalAlignment.CENTER);
+        styleCenter.setVerticalAlignment(VerticalAlignment.CENTER);
+        styleCenter.setFont(font);
+        styleCenter.setBorderBottom(BorderStyle.THIN);
+        styleCenter.setBorderTop(BorderStyle.THIN);
+        styleCenter.setBorderLeft(BorderStyle.THIN);
+        styleCenter.setBorderRight(BorderStyle.THIN);
+
+        CellStyle styleCenterBold = book.createCellStyle();
+        styleCenterBold.setWrapText(true);
+        styleCenterBold.setAlignment(HorizontalAlignment.CENTER);
+        styleCenterBold.setVerticalAlignment(VerticalAlignment.CENTER);
+        styleCenterBold.setFont(fontBold);
+        styleCenterBold.setBorderBottom(BorderStyle.THIN);
+        styleCenterBold.setBorderTop(BorderStyle.THIN);
+        styleCenterBold.setBorderLeft(BorderStyle.THIN);
+        styleCenterBold.setBorderRight(BorderStyle.THIN);
+
+        CellStyle styleLeftNotBold = book.createCellStyle();
+        styleLeftNotBold.setAlignment(HorizontalAlignment.LEFT);
+        styleLeftNotBold.setVerticalAlignment(VerticalAlignment.CENTER);
+        styleLeftNotBold.setFont(font);
+        styleLeftNotBold.setBorderBottom(BorderStyle.THIN);
+        styleLeftNotBold.setBorderTop(BorderStyle.THIN);
+        styleLeftNotBold.setBorderLeft(BorderStyle.THIN);
+        styleLeftNotBold.setBorderRight(BorderStyle.THIN);
+
+        CellStyle styleNoteUnLocked = book.createCellStyle();
+        styleNoteUnLocked.setWrapText(true);
+        styleNoteUnLocked.setLocked(false);
+        styleNoteUnLocked.setAlignment(HorizontalAlignment.CENTER);
+        styleNoteUnLocked.setVerticalAlignment(VerticalAlignment.CENTER);
+        styleNoteUnLocked.setFont(font);
+        styleNoteUnLocked.setBorderBottom(BorderStyle.THIN);
+        styleNoteUnLocked.setBorderTop(BorderStyle.THIN);
+        styleNoteUnLocked.setBorderLeft(BorderStyle.THIN);
+        styleNoteUnLocked.setBorderRight(BorderStyle.THIN);
+
+        List<Cargo> cargos = controllerCargo.get(dashboard.teacherAuth, true);
+        cargos.forEach(cargo -> {
+            XSSFSheet sheet = book.createSheet(String.format("%s | %s", cargo.getGrade().getName(), cargo.getCourse().getAbbreviation()));
+            sheet.setColumnWidth(0, 4200);
+            sheet.setColumnWidth(1, 3800);
+            sheet.setColumnWidth(2, 3800);
+            sheet.setColumnWidth(3, 3800);
+            sheet.protectSheet("aip-bd");
+            sheet.createFreezePane(4, 0);
+            Row row = sheet.createRow(0);
+            Cell cell = row.createCell(0);
+            cell.setCellStyle(styleCenter);
+            cell.setCellValue(cargo.getCourse().getAbbreviation());
+            sheet.addMergedRegion(new CellRangeAddress(row.getRowNum(), row.getRowNum(), 0, 3));
+
+            row = sheet.createRow(1);
+            cell = row.createCell(0);
+            cell.setCellStyle(styleLeft);
+            cell.setCellValue("Nivel");
+
+            cell = row.createCell(1);
+            cell.setCellStyle(styleCenter);
+            cell.setCellValue(dashboard.teacherAuth.level.getLevel());
+            sheet.addMergedRegion(new CellRangeAddress(row.getRowNum(), row.getRowNum(), 1, 3));
+
+            row = sheet.createRow(2);
+            cell = row.createCell(0);
+            cell.setCellStyle(styleLeft);
+            cell.setCellValue("Grado:");
+
+            cell = row.createCell(1);
+            cell.setCellStyle(styleCenter);
+            cell.setCellValue(cargo.getGrade().getClassroom().getClassroom());
+
+            cell = row.createCell(2);
+            cell.setCellStyle(styleLeft);
+            cell.setCellValue("Sección:");
+
+            cell = row.createCell(3);
+            cell.setCellStyle(styleCenter);
+            cell.setCellValue(cargo.getGrade().getSection().getSection());
+
+            row = sheet.createRow(3);
+            cell = row.createCell(0);
+            cell.setCellStyle(styleLeft);
+            cell.setCellValue("Docente:");
+
+            cell = row.createCell(1);
+            cell.setCellStyle(styleCenter);
+            cell.setCellValue(dashboard.teacherAuth.getFullName());
+            sheet.addMergedRegion(new CellRangeAddress(row.getRowNum(), row.getRowNum(), 1, 3));
+
+            row = sheet.createRow(4);
+            cell = row.createCell(0);
+            cell.setCellStyle(styleLeft);
+            cell.setCellValue("Código");
+
+            cell = row.createCell(1);
+            cell.setCellStyle(styleCenterBold);
+            cell.setCellValue("Apellidos y Nombres");
+            sheet.addMergedRegion(new CellRangeAddress(row.getRowNum(), row.getRowNum(), 1, 3));
+
+
+            cell = sheet.getRow(0).createCell(4);
+            cell.setCellStyle(styleCenterBold);
+            cell.setCellValue(cargo.getCourse().getName());
+            CellRangeAddress rangeCourse = new CellRangeAddress(0, 0, 4,3+cargo.getCourse().getSkills().size()*2);
+            sheet.addMergedRegion(rangeCourse);
+
+            int index = 4;
+            for (Skill skill : cargo.getCourse().getSkills()) {
+                cell = sheet.getRow(1).createCell(index);
+                cell.setCellStyle(styleCenterBold);
+                cell.setCellValue(String.format("%d. %s", skill.getIndex(), skill.getName()));
+                sheet.addMergedRegion(new CellRangeAddress(1, 3, index, index+1));
+                sheet.setColumnWidth(index, 1500);
+                sheet.setColumnWidth(index+1, 10500);
+
+                cell = sheet.getRow(4).createCell(index);
+                cell.setCellStyle(styleCenterBold);
+                cell.setCellValue("NL");
+
+                cell = sheet.getRow(4).createCell(++index);
+                cell.setCellStyle(styleCenterBold);
+                cell.setCellValue("Conclusión descriptiva");
+
+                index++;
+            }
+
+            index = 5;
+            List<Registration> registrations = controllerRegistration.all(cargo.getGrade(), true);
+            if (registrations.isEmpty()) {
+                controllerRegistration.downloadData(dashboard.teacherAuth, cargo.getGrade());
+                registrations = controllerRegistration.all(cargo.getGrade(), true);
+            }
+            for (Registration registration : registrations) {
+                row = sheet.createRow(index++);
+                cell = row.createCell(0);
+                cell.setCellStyle(styleLeftNotBold);
+                cell.setCellValue(registration.getStudent().getCodeStudent());
+
+                cell = row.createCell(1);
+                cell.setCellStyle(styleLeftNotBold);
+                cell.setCellValue(registration.getStudent().getFullName());
+                sheet.addMergedRegion(new CellRangeAddress(row.getRowNum(), row.getRowNum(), 1, 3));
+
+                for (int c = rangeCourse.getFirstColumn(); c<=rangeCourse.getLastColumn(); c++ ){
+                    cell = row.createCell(c);
+                    cell.setCellStyle(styleNoteUnLocked);
+//                    Note note = controllerNote.get(
+//                            cargo.getGrade(),
+//                            cargo.getCourse(),
+//                            skill,
+//                            partial,
+//                            cargo.getTeacher(),
+//                            registration.getStudent(),
+//                            dashboard.teacherAuth.level);
+                }
+            }
+
+            index = 4;
+            for (Skill ignore : cargo.getCourse().getSkills()) {
+                DataValidationHelper validationHelper = new XSSFDataValidationHelper(sheet);
+                CellRangeAddressList addressList = new CellRangeAddressList(5, registrations.size()+4, index, index);
+                DataValidationConstraint constraint = validationHelper.createExplicitListConstraint(new String[]{"AD", "A", "B", "C"});
+                DataValidation dataValidation = validationHelper.createValidation(constraint, addressList);
+                dataValidation.setSuppressDropDownArrow(true);
+                dataValidation.setShowErrorBox(true);
+                dataValidation.setErrorStyle(DataValidation.ErrorStyle.STOP);
+                dataValidation.createErrorBox("Nivel de logro", "El nivel de logro ingresado no es válido, sólo se acepta: AD, A, B o C");
+                sheet.addValidationData(dataValidation);
+
+                CellRangeAddressList addressCell = new CellRangeAddressList(5, registrations.size()+4, index+1, index+1);
+                DataValidationConstraint constraintBetween = validationHelper.createNumericConstraint(
+                        DataValidationConstraint.ValidationType.TEXT_LENGTH,
+                        DataValidationConstraint.OperatorType.BETWEEN,
+                        "11", "64");
+                DataValidation dataValidationText = validationHelper.createValidation(constraintBetween, addressCell);
+                dataValidationText.setShowErrorBox(true);
+                dataValidationText.setErrorStyle(DataValidation.ErrorStyle.STOP);
+                dataValidationText.createErrorBox("Conclusión descriptiva", "La conclusión descriptiva debe contener mínimo 11 y máximo 64 caracteres.");
+                sheet.addValidationData(dataValidationText);
+                index += 2;
+            }
+            for (CellRangeAddress range : sheet.getMergedRegions()) {
+                RegionUtil.setBorderTop(styleLeft.getBorderTop(), range, sheet);
+                RegionUtil.setBorderRight(styleLeft.getBorderRight(), range, sheet);
+                RegionUtil.setBorderBottom(styleLeft.getBorderBottom(), range, sheet);
+                RegionUtil.setBorderLeft(styleLeft.getBorderLeft(), range, sheet);
+            }
+        });
+    }
     public void querySet(Classroom classroom, Long numPartial){
         this.numPartial = numPartial;
         ControllerGrade controllerGrade = new ControllerGrade();
@@ -557,6 +768,7 @@ public class Excel {
         ControllerLevel controllerLevel = new ControllerLevel();
         ControllerClassroom controllerClassroom = new ControllerClassroom();
         ControllerSection controllerSection = new ControllerSection();
+        ControllerSkill controllerSkill = new ControllerSkill();
 
         List<NoteModel> notes = new ArrayList<>();
         for (int i = 0; i < book.getNumberOfSheets(); i++) {
@@ -597,10 +809,10 @@ public class Excel {
                         String n = row.getCell(4+col).getStringCellValue();
                         String o = row.getCell(5+col).getStringCellValue();
 
-                        if (!o.isEmpty() && (o.length() > 64 || o.length() < 11)) {
+                        if (!o.isEmpty() && (o.length() > 125 || o.length() < 11)) {
                             JOptionPane.showMessageDialog(dashboard,
                                     "La conclusión descriptiva ingresada, no es válida.\n" +
-                                            "El valor ingresado, debe contener mínimo 11 y máximo 64 carácteres.\n" +
+                                            "El valor ingresado, debe contener mínimo 11 y máximo 125 carácteres.\n" +
                                             grade.getName()+" : "+ course.getName()+"\n" +
                                             "Alumna(o): "+student.getFullName(),
                                     "Cambios no guardados",
@@ -610,7 +822,7 @@ public class Excel {
                         if (n.equals("C") && o.trim().isEmpty()) {
                             JOptionPane.showMessageDialog(dashboard,
                                     "La conclusión descriptiva ingresada, no es válida.\n" +
-                                            "El valor ingresado, debe contener mínimo 11 y máximo 64 carácteres.\n" +
+                                            "El valor ingresado, debe contener mínimo 11 y máximo 125 carácteres.\n" +
                                             grade.getName()+" : "+ course.getName()+"\n" +
                                             "Alumna(o): "+student.getFullName(),
                                     "Cambios no guardados",
@@ -620,7 +832,7 @@ public class Excel {
                         if (dashboard.teacherAuth.level.getLevel().equalsIgnoreCase("Primaria") && n.equals("B") && o.trim().isEmpty()) {
                             JOptionPane.showMessageDialog(dashboard,
                                     "La conclusión descriptiva ingresada, no es válida.\n" +
-                                            "El valor ingresado, debe contener mínimo 11 y máximo 64 carácteres.\n" +
+                                            "El valor ingresado, debe contener mínimo 11 y máximo 125 carácteres.\n" +
                                             grade.getName()+" : "+ course.getName()+"\n" +
                                             "Alumna(o): "+student.getFullName(),
                                     "Cambios no guardados",
@@ -633,16 +845,16 @@ public class Excel {
                         note.course = course.getId();
                         note.teacher = cargo.getTeacher().getId();
                         note.student = student.getId();
-                        note.partial = dashboard.permission.getPartial();
+                        note.partial = controllerPartial.get(dashboard.permission.getPartial(), course).getId();
                         note.note = n;
                         note.observation = o;
-                        note.skill = switch (col){
-                            case 0 -> 1L;
-                            case 2 -> 2L;
-                            case 4 -> 3L;
-                            case 6 -> 4L;
-                            default -> 5L;
-                        };
+                        note.skill = controllerSkill.get(course, switch (col) {
+                            case 0 -> 1;
+                            case 2 -> 2;
+                            case 4 -> 3;
+                            case 6 -> 4;
+                            default -> 5;
+                        }).getId();
                         notes.add(note);
                     }
                 }
