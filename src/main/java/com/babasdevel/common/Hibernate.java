@@ -14,7 +14,7 @@ public class Hibernate {
         Configuration configuration = new Configuration();
         configuration.setProperty("hibernate.connection.user", "eder");
         configuration.setProperty("hibernate.connection.password", "-YaST_42@.-.rpm-");
-        configuration.setProperty("hibernate.hbm2ddl.auto", isProduction?"update":"create-drop");
+        configuration.setProperty("hibernate.hbm2ddl.auto", isProduction?"update":"");
         configuration.configure();
         session = configuration.buildSessionFactory().openSession();
         builder = session.getCriteriaBuilder();

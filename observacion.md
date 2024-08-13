@@ -19,6 +19,3 @@ Secundaria
     [ ] Nada
 # Usca Mandujano, David
     [ ] Nada
-
-# Carlos Alberto Vazques
-    [ ] Nada

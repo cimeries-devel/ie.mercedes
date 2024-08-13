@@ -136,15 +136,20 @@ public class Printing {
         this.type = type;
         prints = new ArrayList<>();
         for (Student student : students) {
+            List<ModelReport> objectsReport = new ArrayList<>();
             input = Application.class.getResourceAsStream("/com/babasdevel/views/jasper/A4.jasper");
             Map<String, Object> params = new HashMap<>();
-            params.put("logo_mde", Application.class.getResource("/com/babasdevel/views/mde.png").toExternalForm());
+            params.put("title", String.format(
+                    "BOLETA DE INFORMACIÓN DEL ESTUDIANTE - %s BIMESTRE %s",
+                    "2DO",
+                    "2024"));
+            params.put("logo_education", Application.class.getResource("/com/babasdevel/views/mde.png").toExternalForm());
             params.put("logo_school", Application.class.getResource("/com/babasdevel/views/logo.png").toExternalForm());
-            params.put("dre", "DRE MADRE DE DIOS");
-            params.put("ugel", "UGEL Tambopata");
-            params.put("nivel", dashboard.teacherAuth.level.getLevel());
-            params.put("code_module", "0688283-0");
-            params.put("school", "Nuestra Señora de las Mercedes");
+            params.put("dre", "Madre de Dios");
+            params.put("ugel", "Tambopata");
+            params.put("level", dashboard.teacherAuth.level.getLevel());
+            params.put("code_module", "0206391-0");
+            params.put("school", "52005 \"NUESTRA SEÑORA DE LAS MERCEDES\"");
             params.put("grade", grade.getClassroom().getClassroom());
             params.put("section", grade.getSection().getSection());
             params.put("student", String.format(
@@ -152,9 +157,7 @@ public class Printing {
                     student.getLastNameFather(),
                     student.getLastNameMother(),
                     student.getFirstName()));
-            params.put("code_student", student.getCodeStudent());
-            params.put("dni", student.getNumberDocument());
-            params.put("tutor", String.format("%s %s",
+            params.put("teacher", String.format("%s %s",
                     tutor.getTeacher().getFirstName(),
                     tutor.getTeacher().getLastName()));
 
@@ -162,41 +165,45 @@ public class Printing {
             ControllerNote controllerNote = new ControllerNote();
             ControllerCargo controllerCargo = new ControllerCargo();
             for (Course course : courses) {
+                ModelReport model = new ModelReport();
+                model.setCourse(course.getName());
+                Partial p = controllerPartial.get(partial, course);
                 Cargo cargo = controllerCargo.get(grade, course, true);
                 if (cargo == null) controllerCargo.downloadCargo(dashboard.teacherAuth, grade, course);
                 Teacher teacher = controllerCargo.get(grade, course, true).getTeacher();
-                params.put("course_"+course.getId(), course.getName());
-                Partial p = controllerPartial.get(partial, course);
-                for (int index = 0; index < course.getSkills().size(); index++){
-                    Skill skill = course.getSkills().get(index);
+                for (Skill skill : course.getSkills()) {
                     Note note = controllerNote.get(grade, course, skill, p, teacher, student, dashboard.teacherAuth.level);
-                    switch (course.getSkills().get(index).getIndex()){
+                    switch (skill.getIndex()){
                         case 1:
-                            params.put("skill_c"+course.getId()+"_"+1, skill.getName());
-                            params.put("nl_c"+course.getId()+"_"+1, note==null?"":note.getNote());
-                            params.put("cd_c"+course.getId()+"_"+1, note==null?"":note.getObservation());
+                            model.setSkill_1(skill.getName());
+                            model.setNote_1(note==null?"-":note.getNote());
+                            model.setObservation_1(note==null?"-":note.getObservation());
                             break;
                         case 2:
-                            params.put("skill_c"+course.getId()+"_"+2, skill.getName());
-                            params.put("nl_c"+course.getId()+"_"+2, note==null?"":note.getNote());
-                            params.put("cd_c"+course.getId()+"_"+2, note==null?"":note.getObservation());
+                            model.setSkill_2(skill.getName());
+                            model.setNote_2(note==null?"-":note.getNote());
+                            model.setObservation_2(note==null?"-":note.getObservation());
                             break;
                         case 3:
-                            params.put("skill_c"+course.getId()+"_"+3, skill.getName());
-                            params.put("nl_c"+course.getId()+"_"+3, note==null?"":note.getNote());
-                            params.put("cd_c"+course.getId()+"_"+3, note==null?"":note.getObservation());
+                            model.setSkill_3(skill.getName());
+                            model.setNote_3(note==null?"-":note.getNote());
+                            model.setObservation_3(note==null?"-":note.getObservation());
                             break;
                         case 4:
-                            params.put("skill_c"+course.getId()+"_"+4, skill.getName());
-                            params.put("nl_c"+course.getId()+"_"+4, note==null?"":note.getNote());
-                            params.put("cd_c"+course.getId()+"_"+4, note==null?"":note.getObservation());
+                            model.setSkill_4(skill.getName());
+                            model.setNote_4(note==null?"-":note.getNote());
+                            model.setObservation_4(note==null?"-":note.getObservation());
+                            break;
                         default:
-                            params.put("skill_c"+course.getId()+"_"+5, skill.getName());
-                            params.put("nl_c"+course.getId()+"_"+5, note==null?"":note.getNote());
-                            params.put("cd_c"+course.getId()+"_"+5, note==null?"":note.getObservation());
+                            model.setSkill_5(skill.getName());
+                            model.setNote_5(note==null?"-":note.getNote());
+                            model.setObservation_5(note==null?"-":note.getObservation());
                     }
                 }
+                objectsReport.add(model);
             }
+            JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(objectsReport);
+            params.put("data", dataSource);
             try {
                 if (type == 0){
                     JasperReport report = (JasperReport) JRLoader.loadObject(input);

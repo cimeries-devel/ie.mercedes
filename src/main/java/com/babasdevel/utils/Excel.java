@@ -37,6 +37,7 @@ public class Excel {
     private final ControllerNote controllerNote;
     private final ControllerPartial controllerPartial;
     private final ControllerRegistration controllerRegistration;
+    private final ControllerSkill controllerSkill;
     public Excel(Dashboard dashboard){
         this.dashboard = dashboard;
         book = new XSSFWorkbook();
@@ -53,6 +54,7 @@ public class Excel {
         controllerStudent = new ControllerStudent();
         controllerNote = new ControllerNote();
         controllerPartial = new ControllerPartial();
+        controllerSkill = new ControllerSkill();
     }
     public void createConsolidated(){
         createSchema();
@@ -436,14 +438,30 @@ public class Excel {
                 for (int c = rangeCourse.getFirstColumn(); c<=rangeCourse.getLastColumn(); c++ ){
                     cell = row.createCell(c);
                     cell.setCellStyle(styleNoteUnLocked);
-//                    Note note = controllerNote.get(
-//                            cargo.getGrade(),
-//                            cargo.getCourse(),
-//                            skill,
-//                            partial,
-//                            cargo.getTeacher(),
-//                            registration.getStudent(),
-//                            dashboard.teacherAuth.level);
+                    Course course = cargo.getCourse();
+                    Skill skill = controllerSkill.get(course, switch (c){
+                        case 4, 5 -> 1;
+                        case 6, 7 -> 2;
+                        case 8, 9 -> 3;
+                        case 10, 11 -> 4;
+                        default -> 5;
+                    });
+                    Partial partial = controllerPartial.get(dashboard.permission.getPartial(), course);
+
+                    Note note = controllerNote.get(
+                            cargo.getGrade(),
+                            course,
+                            skill,
+                            partial,
+                            cargo.getTeacher(),
+                            registration.getStudent(),
+                            dashboard.teacherAuth.level);
+                    if (c % 2 == 0) {
+                        cell.setCellValue(note.getNote());
+                    } else {
+                        cell.setCellValue(note.getObservation());
+                    }
+
                 }
             }
 
@@ -668,7 +686,8 @@ public class Excel {
                     for (Row row : sheet){
                         String code = formatter.formatCellValue(row.getCell(1));
                         if (!StringUtils.isNumeric(code)) continue;
-                        Student student = controllerStudent.get(String.valueOf(Long.parseLong(code)));
+//                        Student student = controllerStudent.get(String.valueOf(Long.parseLong(code)));
+                        Student student = controllerStudent.get(code);
                         if (student == null) continue;
                         for (Skill skill : cargo.getCourse().getSkills()) {
                             Partial partial = controllerPartial.get(dashboard.permission.getPartial(), cargo.getCourse());
@@ -719,11 +738,12 @@ public class Excel {
         Sheet sheet_auto = book.getSheet("0007-GEST AUTO");
         DataFormatter formatter = new DataFormatter();
 
-        Course course = controllerCourse.get("TUTORIA");
+        Course course = controllerCourse.get("TUTORIA", teacher.level);
         for (Row row : sheet_tic){
             String code = formatter.formatCellValue(row.getCell(1));
             if (!StringUtils.isNumeric(code)) continue;
-            Student student = controllerStudent.get(String.valueOf(Long.parseLong(code)));
+//            Student student = controllerStudent.get(String.valueOf(Long.parseLong(code)));
+            Student student = controllerStudent.get(code);
             if (student == null) continue;
 
             Partial partial = controllerPartial.get(numberPartial, course);
@@ -742,7 +762,8 @@ public class Excel {
         for (Row row : sheet_auto){
             String code = formatter.formatCellValue(row.getCell(1));
             if (!StringUtils.isNumeric(code)) continue;
-            Student student = controllerStudent.get(String.valueOf(Long.parseLong(code)));
+//            Student student = controllerStudent.get(String.valueOf(Long.parseLong(code)));
+            Student student = controllerStudent.get(code);
             if (student == null) continue;
 
             Partial partial = controllerPartial.get(2L, course);

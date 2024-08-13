@@ -144,11 +144,10 @@ public class TabRegisterNotesAdmin extends Tab {
         switch (event.getActionCommand()) {
             case "button_generate_pdf":
             case "button_view_pdf":
-//                processPDF(event);
+                processPDF(event);
                 break;
             case "button_siagie":
                 Excel excel = new Excel(dashboard);
-//                excel.createConsolidatedFull();
                 File[] files = excel.loadBooks();
                 if (files != null) {
                     excel.insertNotes(files, dashboard.permission.getLevel());
@@ -159,8 +158,8 @@ public class TabRegisterNotesAdmin extends Tab {
                 if (combo.getSelectedIndex() == 0) {
                     changedTable(null);
                 } else {
-//                    buttonPdf.setEnabled(true);
-//                    buttonView.setEnabled(buttonPdf.isEnabled());
+                    buttonPdf.setEnabled(true);
+                    buttonView.setEnabled(buttonPdf.isEnabled());
                 }
         }
     }
@@ -206,7 +205,9 @@ public class TabRegisterNotesAdmin extends Tab {
         List<Course> courses = controllerCourse.all(dashboard.teacherAuth.level);
 
         ControllerTutor controllerTutor = new ControllerTutor();
-        if (controllerTutor.get(grade, true) == null) controllerTutor.getTutorOnly(dashboard.teacherAuth, grade);
+        Cargo cargo = controllerCargo.get(grade, controllerCourse.get("TUTORIA", dashboard.teacherAuth.level), true);
+        if (controllerTutor.get(grade, true) == null) controllerTutor.getTutorOnly(cargo.getTeacher(), grade);
+
         Tutor tutor = controllerTutor.get(grade, true);
         Printing printing = new Printing(dashboard);
         TabViewPDF viewPDF;
