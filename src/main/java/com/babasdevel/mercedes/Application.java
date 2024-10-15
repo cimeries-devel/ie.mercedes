@@ -21,7 +21,7 @@ public class Application {
         UIManager.put("TabbedPane.closeArc", 15);
         UIManager.put("TabbedPane.closeSize", new Dimension(16, 16));
         UIManager.put("ToggleButton.selectedBackground", new Color(60, 131, 197));
-        UIManager.put("ToggleButton.pressedBackground", new Color(40, 111, 177));
+        UIManager.put("ToggleButton.pressedBackground", new Color(40, 111, 177));file:///home/cimeries/Pictures/DonCarlos.jpeg
         UIManager.put("ToggleButton.selectedForeground", Color.WHITE);
 //        UIManager.put( "TabbedPane.selectedBackground", Color.BLUE );
 //        UIManager.put("TabbedPane.hoverColor", Color.RED);
